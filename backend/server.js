@@ -118,9 +118,15 @@ app.get("/", (req, res) => {
   res.json({ status: "ok", service: "Awqat Al-Salat API" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Awqat API running on http://localhost:${PORT}`);
-});
+// Local dev
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Awqat API running on http://localhost:${PORT}`);
+  });
+}
+
+// Vercel serverless export
+module.exports = app;
 
 // ── City list ─────────────────────────────────────────────────────────────────
 const CITIES = [
