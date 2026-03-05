@@ -643,13 +643,75 @@ body::before {
 .retry-btn:hover { background: var(--teal-lt); }
 
 /* ═══════════════════════════════════════════════════════════════
+   BRAND ICON
+═══════════════════════════════════════════════════════════════ */
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: var(--shadow2);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICATION BUTTON
+═══════════════════════════════════════════════════════════════ */
+.notif-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: white;
+  border: 1.5px solid var(--border2);
+  border-radius: 100px;
+  padding: 8px 14px;
+  font-family: var(--ff-body); font-size: 13px;
+  color: var(--text2); cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow2);
+  white-space: nowrap;
+}
+.notif-btn:hover { border-color: var(--gold); color: var(--gold); }
+.notif-btn.active { background: var(--gold-pale); border-color: var(--gold); color: var(--gold); }
+.notif-btn.denied { opacity: 0.5; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICATION TOAST
+═══════════════════════════════════════════════════════════════ */
+.toast-container {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--ink);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 100px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(15,20,16,0.3);
+  animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: auto;
+  white-space: nowrap;
+  border-left: 3px solid var(--gold);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.toast.out { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(8px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════════════════════════════ */
 .footer {
-  text-align: center; padding-top: 20px;
+  text-align: center; padding-top: 24px; padding-bottom: 8px;
   font-size: 12px; color: var(--text3);
   letter-spacing: 0.04em;
 }
+.footer-copy { font-weight: 500; color: var(--text2); margin-bottom: 4px; font-size: 13px; }
+.footer-data { font-size: 11px; color: var(--text3); }
 .footer a { color: var(--teal); text-decoration: none; }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -665,21 +727,62 @@ body::before {
   .prayers-grid { grid-template-columns: repeat(3, 1fr); }
   .hero-city { font-size: 36px; }
   .hero-clock { font-size: 44px; }
+  .compare-table { overflow-x: auto; display: block; }
+  .compare-table table { min-width: 480px; }
 }
 @media (max-width: 600px) {
-  .hero-card { padding: 24px 20px; }
-  .prayers-grid { grid-template-columns: repeat(2, 1fr); }
+  .main-wrap { padding: 16px 14px 48px; }
+  .hero-card { padding: 20px 18px; }
+  .hero-card::before, .hero-card::after { display: none; }
+  .prayers-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .prayer-card { padding: 14px 10px; }
+  .prayer-arabic { font-size: 17px; }
+  .prayer-time24 { font-size: 22px; }
   .ramadan-row { grid-template-columns: 1fr; }
+  .ramadan-cell { padding: 20px 18px; }
   .ramadan-cell.sehr { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .hero-top { flex-direction: column; }
+  .ramadan-time { font-size: 26px; }
+  .hero-top { flex-direction: column; gap: 12px; }
   .hero-clock-wrap { text-align: left; }
-  .hero-city { font-size: 30px; }
-  .hero-clock { font-size: 36px; }
-  .city-picker-body { padding: 20px; }
-  .city-picker-header { padding: 24px 20px 20px; }
-  .city-picker-header h1 { font-size: 30px; }
-  .next-prayer-block { flex-direction: column; gap: 10px; }
-  .next-countdown { border-left: none; border-top: 1px solid rgba(245,240,232,0.1); padding-left: 0; padding-top: 10px; text-align: left; }
+  .hero-city { font-size: 28px; }
+  .hero-clock { font-size: 32px; }
+  .hero-divider { margin: 16px 0; }
+  .hijri-date { font-size: 18px; }
+  .city-picker-body { padding: 16px; }
+  .city-picker-header { padding: 22px 16px 18px; }
+  .city-picker-header h1 { font-size: 28px; }
+  .city-picker-header .mosque-icon { font-size: 32px; }
+  .next-prayer-block { flex-direction: column; gap: 8px; padding: 12px 14px; }
+  .next-countdown { border-left: none; border-top: 1px solid rgba(245,240,232,0.1); padding-left: 0; padding-top: 8px; text-align: left; }
+  .countdown-val { font-size: 22px; }
+  .next-name { font-size: 20px; }
+  .top-bar { gap: 8px; }
+  .brand { font-size: 22px; }
+  .brand-icon { width: 30px; height: 30px; }
+  .notif-btn { padding: 7px 10px; font-size: 12px; }
+  .notif-btn #notif-label { display: none; }
+  .change-city-btn { padding: 7px 12px; font-size: 12px; }
+  .fiqh-tabs { width: 100%; }
+  .fiqh-tab { flex: 1; padding: 9px 8px; font-size: 12px; }
+  .section-title { font-size: 18px; }
+  .compare-table { overflow-x: auto; display: block; }
+  .compare-table table { min-width: 400px; }
+  .compare-table thead th,
+  .compare-table tbody td { padding: 10px 12px; }
+  .manual-city-row { flex-wrap: wrap; }
+  .manual-city-row input { min-width: 0; }
+  .city-list { max-height: 200px; }
+  .hero-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .next-prayer-block { width: 100%; box-sizing: border-box; }
+  .ramadan-header { padding: 14px 18px; }
+  .ramadan-header h2 { font-size: 20px; }
+  .ramadan-header .ar { font-size: 16px; }
+}
+@media (max-width: 380px) {
+  .prayers-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .hero-city { font-size: 24px; }
+  .hero-clock { font-size: 28px; }
+  .brand { font-size: 19px; }
 }
 </style>
 </head>
@@ -715,12 +818,21 @@ body::before {
 
     <!-- TOP BAR -->
     <div class="top-bar">
-      <div class="brand">Awqat <span>al-Salat</span></div>
-      <button class="change-city-btn" id="change-city-btn">
-        <span class="pin">📍</span>
-        <span id="current-city-label">—</span>
-        <span>↓</span>
-      </button>
+      <div class="brand">
+        <img src="icons/icon-192x192.png" alt="Awqat" class="brand-icon" />
+        Awqat <span>al-Salat</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="notif-btn" id="notif-btn" title="Enable prayer notifications">
+          <span id="notif-icon">🔔</span>
+          <span id="notif-label">Notify</span>
+        </button>
+        <button class="change-city-btn" id="change-city-btn">
+          <span class="pin">📍</span>
+          <span id="current-city-label">—</span>
+          <span>↓</span>
+        </button>
+      </div>
     </div>
 
     <!-- LOADING STATE -->
@@ -851,8 +963,11 @@ body::before {
     </div><!-- /data-content -->
 
     <div class="footer">
-      Data from <a href="https://aladhan.com" target="_blank">AlAdhan API</a> ·
-      Hanafi (Method 1, school=1) · Jafari (Method 7)
+      <div class="footer-copy">© 2025 Hasso Mahmood. All rights reserved.</div>
+      <div class="footer-data">
+        Data from <a href="https://aladhan.com" target="_blank">AlAdhan API</a> ·
+        Hanafi (Method 1, school=1) · Jafari (Method 7)
+      </div>
     </div>
 
   </div><!-- /main-wrap -->
@@ -1096,6 +1211,9 @@ function updateClock(data) {
   document.getElementById('hero-date').textContent =
     now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
+  // Check notifications every minute (only on second=0)
+  if (now.getSeconds() === 0) checkAndNotify(appData);
+
   if (!data) return;
   const nowMins = now.getHours() * 60 + now.getMinutes();
   const src     = appData.hanafi;
@@ -1153,6 +1271,143 @@ function showState(state) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadCityList();
+initNotifications();
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, duration = 4000) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 350);
+  }, duration);
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+let notifEnabled = false;
+let notifGranted = false;
+let firedToday   = new Set(); // track which prayers already notified today
+
+function initNotifications() {
+  const btn = document.getElementById('notif-btn');
+  if (!('Notification' in window)) {
+    btn.style.display = 'none';
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    notifGranted = true;
+    notifEnabled = true;
+    setNotifBtnState('active');
+  } else if (Notification.permission === 'denied') {
+    setNotifBtnState('denied');
+  }
+  btn.addEventListener('click', toggleNotifications);
+}
+
+async function toggleNotifications() {
+  if (Notification.permission === 'denied') {
+    showToast('⚠️ Notifications blocked. Please enable in browser site settings.');
+    return;
+  }
+  // Already granted by browser — just toggle the in-app enabled state
+  if (Notification.permission === 'granted') {
+    notifGranted = true;
+    if (!notifEnabled) {
+      notifEnabled = true;
+      setNotifBtnState('active');
+      showToast('🔔 Prayer notifications enabled!');
+    } else {
+      notifEnabled = false;
+      setNotifBtnState('');
+      showToast('🔕 Notifications disabled.');
+    }
+    return;
+  }
+  // Permission not yet asked — request it
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    notifGranted = true;
+    notifEnabled = true;
+    setNotifBtnState('active');
+    showToast('🔔 Prayer notifications enabled!');
+  } else {
+    setNotifBtnState('denied');
+    showToast('Notifications permission denied.');
+  }
+}
+
+function setNotifBtnState(state) {
+  const btn  = document.getElementById('notif-btn');
+  const icon = document.getElementById('notif-icon');
+  const lbl  = document.getElementById('notif-label');
+  btn.className = 'notif-btn' + (state ? ' ' + state : '');
+  if (state === 'active') { icon.textContent = '🔔'; if(lbl) lbl.textContent = 'On'; }
+  else if (state === 'denied') { icon.textContent = '🔕'; if(lbl) lbl.textContent = 'Blocked'; }
+  else { icon.textContent = '🔔'; if(lbl) lbl.textContent = 'Notify'; }
+}
+
+function checkAndNotify(data) {
+  if (!notifEnabled || !notifGranted || !data) return;
+
+  const now   = new Date();
+  const hhmm  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const todayKey = now.toDateString();
+
+  // Reset fired set each new day
+  if (!firedToday._day || firedToday._day !== todayKey) {
+    firedToday = new Set();
+    firedToday._day = todayKey;
+  }
+
+  const isRamadan = data.date?.hijri?.isRamadan;
+
+  // Build list of times to notify
+  const checks = [
+    { key: 'fajr_h',    time: data.hanafi.fajr,    title: '🕌 Fajr (Hanafi)',    body: 'Time for Fajr prayer — Hanafi' },
+    { key: 'fajr_j',    time: data.jafari.fajr,    title: '🕌 Fajr (Jafari)',    body: 'Time for Fajr prayer — Jafari' },
+    { key: 'dhuhr_h',   time: data.hanafi.dhuhr,   title: '🕌 Dhuhr (Hanafi)',   body: 'Time for Dhuhr prayer — Hanafi' },
+    { key: 'dhuhr_j',   time: data.jafari.dhuhr,   title: '🕌 Dhuhr (Jafari)',   body: 'Time for Dhuhr prayer — Jafari' },
+    { key: 'asr_h',     time: data.hanafi.asr,     title: '🕌 Asr (Hanafi)',     body: 'Time for Asr prayer — Hanafi' },
+    { key: 'asr_j',     time: data.jafari.asr,     title: '🕌 Asr (Jafari)',     body: 'Time for Asr prayer — Jafari' },
+    { key: 'maghrib_h', time: data.hanafi.maghrib,  title: '🕌 Maghrib (Hanafi)', body: 'Time for Maghrib prayer — Hanafi' },
+    { key: 'maghrib_j', time: data.jafari.maghrib,  title: '🕌 Maghrib (Jafari)', body: 'Time for Maghrib prayer — Jafari' },
+    { key: 'isha_h',    time: data.hanafi.isha,    title: '🕌 Isha (Hanafi)',    body: 'Time for Isha prayer — Hanafi' },
+    { key: 'isha_j',    time: data.jafari.isha,    title: '🕌 Isha (Jafari)',    body: 'Time for Isha prayer — Jafari' },
+  ];
+
+  if (isRamadan) {
+    checks.push(
+      { key: 'sehr_h',  time: data.hanafi.imsak,   title: '☽ Sehr ends (Hanafi)',  body: 'Suhoor time is ending — Hanafi' },
+      { key: 'sehr_j',  time: data.jafari.imsak,   title: '☽ Sehr ends (Jafari)',  body: 'Suhoor time is ending — Jafari' },
+      { key: 'iftar_h', time: data.hanafi.maghrib,  title: '🌙 Iftar time (Hanafi)', body: 'Time to break your fast — Hanafi' },
+      { key: 'iftar_j', time: data.jafari.maghrib,  title: '🌙 Iftar time (Jafari)', body: 'Time to break your fast — Jafari' },
+    );
+  }
+
+  checks.forEach(({ key, time, title, body }) => {
+    if (!time || time === '--:--') return;
+    const t = time.substring(0, 5);
+    if (t === hhmm && !firedToday.has(key)) {
+      firedToday.add(key);
+      // In-app toast always
+      showToast(`${title} — ${t}`, 6000);
+      // Browser notification
+      try {
+        new Notification(title, {
+          body,
+          icon: 'icons/icon-192x192.png',
+          badge: 'icons/icon-192x192.png',
+          tag: key,
+        });
+      } catch(e) {}
+    }
+  });
+}
+
 </script>
+<div class="toast-container" id="toast-container"></div>
 </body>
 </html>
