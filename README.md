@@ -7,8 +7,7 @@ awqat/
 ├── backend/           ← Node.js/Express API  → deploy to Vercel (free, no card)
 │   ├── server.js
 │   └── package.json
-├── frontend/          ← Static HTML/CSS/JS   → deploy to GitHub Pages (free)
-│   └── index.html
+├── index.html         ← Static HTML/CSS/JS   → deploy to GitHub Pages (free)
 ├── vercel.json        ← Vercel config (already included)
 └── README.md
 ```
@@ -35,12 +34,12 @@ git push -u origin main
 6. Copy your URL e.g. https://awqat-abc123.vercel.app
 
 ### Step 3 — Update API URL in frontend
-Open frontend/index.html, find:
+Open index.html, find:
   : 'https://awqat-api.onrender.com';
 Replace with your Vercel URL, commit and push.
 
 ### Step 4 — Enable GitHub Pages
-GitHub repo → Settings → Pages → Branch: main, Folder: /frontend → Save
+GitHub repo → Settings → Pages → Branch: main, Folder: /root → Save
 Your app: https://YOUR_USERNAME.github.io/awqat
 
 ---
