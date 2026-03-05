@@ -139,6 +139,8 @@ const CITIES = [
   { city: "Multan",         country: "PK", label: "Multan",         region: "Pakistan" },
   { city: "Faisalabad",     country: "PK", label: "Faisalabad",     region: "Pakistan" },
   { city: "Rawalpindi",     country: "PK", label: "Rawalpindi",     region: "Pakistan" },
+  { city: "Abdul Hakeem",     country: "PK", label: "Abdul Hakeem",     region: "Pakistan" },
+  { city: "Lakki Marwat",     country: "PK", label: "Lakki Marwat",     region: "Pakistan" },
   // Middle East
   { city: "Makkah",         country: "SA", label: "Makkah",         region: "Saudi Arabia" },
   { city: "Madinah",        country: "SA", label: "Madinah",        region: "Saudi Arabia" },
