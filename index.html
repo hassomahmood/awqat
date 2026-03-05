@@ -1309,24 +1309,33 @@ function initNotifications() {
 
 async function toggleNotifications() {
   if (Notification.permission === 'denied') {
-    showToast('⚠️ Notifications blocked. Please enable in browser settings.');
+    showToast('⚠️ Notifications blocked. Please enable in browser site settings.');
     return;
   }
-  if (!notifEnabled) {
-    const perm = await Notification.requestPermission();
-    if (perm === 'granted') {
-      notifGranted = true;
+  // Already granted by browser — just toggle the in-app enabled state
+  if (Notification.permission === 'granted') {
+    notifGranted = true;
+    if (!notifEnabled) {
       notifEnabled = true;
       setNotifBtnState('active');
       showToast('🔔 Prayer notifications enabled!');
     } else {
-      setNotifBtnState('denied');
-      showToast('Notifications permission denied.');
+      notifEnabled = false;
+      setNotifBtnState('');
+      showToast('🔕 Notifications disabled.');
     }
+    return;
+  }
+  // Permission not yet asked — request it
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    notifGranted = true;
+    notifEnabled = true;
+    setNotifBtnState('active');
+    showToast('🔔 Prayer notifications enabled!');
   } else {
-    notifEnabled = false;
-    setNotifBtnState('');
-    showToast('🔕 Notifications disabled.');
+    setNotifBtnState('denied');
+    showToast('Notifications permission denied.');
   }
 }
 
