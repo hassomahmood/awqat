@@ -362,7 +362,7 @@ body::before {
   padding: 18px 32px;
   display: flex; align-items: center; gap: 14px;
 }
-.ramadan-header .moon { font-size: 28px; }
+.ramadan-header .moon { font-size: 28px; color: white; }
 .ramadan-header h2 {
   font-family: var(--ff-display);
   font-size: 26px; font-weight: 400;
