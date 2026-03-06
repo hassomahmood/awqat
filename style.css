@@ -151,8 +151,13 @@ body::before {
   border-radius: var(--r);
   background: var(--surface);
 }
-.city-list::-webkit-scrollbar { width: 5px; }
-.city-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+/*.city-list::-webkit-scrollbar { width: 5px; }
+.city-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }*/
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border); }
 
 .city-group-label {
   padding: 8px 16px 4px;
