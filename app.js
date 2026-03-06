@@ -23,6 +23,28 @@ let clockInterval;
 let notifEnabled = false;
 let notifGranted = false;
 let firedToday   = new Set();
+let cityTimezone = null; // set when city data loads
+
+// Returns { h, m, s } for the current moment in a given IANA timezone
+function nowInTZ(tz) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    hour:   '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  }).formatToParts(new Date());
+  const get = (t) => parseInt(parts.find(p => p.type === t).value);
+  return { h: get('hour'), m: get('minute'), s: get('second') };
+}
+
+function nowMinsInTZ(tz) {
+  const { h, m } = nowInTZ(tz);
+  return h * 60 + m;
+}
+
+function nowHHMMInTZ(tz) {
+  const { h, m } = nowInTZ(tz);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
 
 // ── City list ────────────────────────────────────────────────────────────────
 let allCities = [];
@@ -125,8 +147,9 @@ async function fetchTimes(city, country) {
 function renderAll(data) {
   // Hero
   document.getElementById('hero-city').textContent = data.city;
+  cityTimezone = data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
   document.getElementById('hero-city-sub').textContent =
-    `${data.country}  ·  ${data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+    `${data.country}  ·  ${cityTimezone}`;
 
   // Hijri
   const h = data.date.hijri;
@@ -162,8 +185,7 @@ function renderAll(data) {
 function renderPrayerCards() {
   if (!appData) return;
   const grid    = document.getElementById('prayers-grid');
-  const now     = new Date();
-  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const nowMins = nowMinsInTZ(cityTimezone);
   const src     = activeFiqh === 'jafari' ? appData.jafari : appData.hanafi;
   const src2    = activeFiqh === 'both'   ? appData.jafari : null;
   const activeI = getActiveIndex(src, nowMins);
@@ -192,8 +214,7 @@ function renderPrayerCards() {
 
 function renderCompareTable() {
   if (!appData) return;
-  const now     = new Date();
-  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const nowMins = nowMinsInTZ(cityTimezone);
   const activeI = getActiveIndex(appData.hanafi, nowMins);
   const tbody   = document.getElementById('compare-tbody');
 
@@ -238,17 +259,27 @@ function startClock(data) {
 }
 
 function updateClock(data) {
-  const now = new Date();
-  document.getElementById('hero-clock').textContent =
-    now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-  document.getElementById('hero-date').textContent =
-    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const tz  = cityTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false
+  }).formatToParts(new Date());
+  const dParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, weekday:'long', day:'numeric', month:'long', year:'numeric'
+  }).formatToParts(new Date());
+
+  const timeStr = tParts.filter(p => p.type !== 'literal' || p.value === ':')
+                        .map(p => p.value).join('');
+  const dateStr = dParts.map(p => p.value).join('');
+
+  document.getElementById('hero-clock').textContent = timeStr;
+  document.getElementById('hero-date').textContent  = dateStr;
 
   // Check notifications every minute (only on second=0)
-  if (now.getSeconds() === 0) checkAndNotify(appData);
+  const sec = parseInt(tParts.find(p => p.type === 'second').value);
+  if (sec === 0) checkAndNotify(appData);
 
   if (!data) return;
-  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const nowMins = nowMinsInTZ(tz);
   const src     = appData.hanafi;
   const activeI = getActiveIndex(src, nowMins);
   const nextI   = (activeI + 1) % PRAYERS.length;
@@ -381,9 +412,10 @@ function setNotifBtnState(state) {
 function checkAndNotify(data) {
   if (!notifEnabled || !notifGranted || !data) return;
 
-  const now   = new Date();
-  const hhmm  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const todayKey = now.toDateString();
+  const tz     = cityTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const hhmm   = nowHHMMInTZ(tz);
+  const todayKey = new Intl.DateTimeFormat('en-GB', { timeZone: tz,
+    year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
 
   // Reset fired set each new day
   if (!firedToday._day || firedToday._day !== todayKey) {
