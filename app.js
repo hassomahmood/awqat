@@ -160,7 +160,7 @@ function renderAll(data) {
     ? `  ·  Local moon sighting (${h.adjustment > 0 ? '+' : ''}${h.adjustment}d from Saudi)`
     : '';
   document.getElementById('hijri-en').textContent =
-    `${h.month.ar} ${h.year}  ·  ${data.date.gregorian.weekday}, ${data.date.gregorian.day} ${data.date.gregorian.month} ${data.date.gregorian.year}${sightingNote}`;
+    `${h.month.ar} ${h.year}  ·  ${data.date.gregorian.weekday}, ${data.date.gregorian.day} ${data.date.gregorian.month} ${data.date.gregorian.year} ${sightingNote}`;
 
   // Ramadan
   if (h.isRamadan) {
