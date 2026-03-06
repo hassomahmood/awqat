@@ -1,0 +1,471 @@
+document.addEventListener("DOMContentLoaded", function() {
+
+// ── Config ───────────────────────────────────────────────────────────────────
+// Replace this with your deployed Render URL after deployment:
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3001'
+  : 'https://awqat-chi.vercel.app';  // ← update this after deploying backend
+
+const PRAYERS = [
+  { key:'fajr',    ar:'الفجر',  en:'Fajr',    color:'#7eb8d4' },
+  { key:'sunrise', ar:'الشروق', en:'Sunrise', color:'#f6c958' },
+  { key:'dhuhr',   ar:'الظهر',  en:'Dhuhr',   color:'#8ab87e' },
+  { key:'asr',     ar:'العصر',  en:'Asr',     color:'#e8a85a' },
+  { key:'maghrib', ar:'المغرب', en:'Maghrib', color:'#e8856a' },
+  { key:'isha',    ar:'العشاء', en:'Isha',    color:'#9b8fcf' },
+];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let appData    = null;
+let activeFiqh = 'hanafi';
+let currentCity, currentCountry;
+let clockInterval;
+let notifEnabled = false;
+let notifGranted = false;
+let firedToday   = new Set();
+let cityTimezone = null; // set when city data loads
+
+// Returns { h, m, s } for the current moment in a given IANA timezone
+function nowInTZ(tz) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    hour:   '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  }).formatToParts(new Date());
+  const get = (t) => parseInt(parts.find(p => p.type === t).value);
+  return { h: get('hour'), m: get('minute'), s: get('second') };
+}
+
+function nowMinsInTZ(tz) {
+  const { h, m } = nowInTZ(tz);
+  return h * 60 + m;
+}
+
+function nowHHMMInTZ(tz) {
+  const { h, m } = nowInTZ(tz);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+// ── City list ────────────────────────────────────────────────────────────────
+let allCities = [];
+
+async function loadCityList() {
+  try {
+    const res = await fetch(`${API_BASE}/api/cities`);
+    allCities = await res.json();
+  } catch {
+    allCities = [];
+  }
+  renderCityList(allCities);
+}
+
+function renderCityList(cities) {
+  const el = document.getElementById('city-list');
+  if (!cities.length) {
+    el.innerHTML = '<div style="padding:16px;color:#7a8e7c;font-size:13px;text-align:center">No cities found</div>';
+    return;
+  }
+  const groups = {};
+  cities.forEach(c => {
+    if (!groups[c.region]) groups[c.region] = [];
+    groups[c.region].push(c);
+  });
+  let html = '';
+  Object.entries(groups).forEach(([region, list]) => {
+    html += `<div class="city-group-label">${region}</div>`;
+    list.forEach(c => {
+      html += `<div class="city-item" data-city="${c.city}" data-country="${c.country}">
+        <span class="city-name">${c.label}</span>
+        <span class="city-arrow">›</span>
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.city-item').forEach(item => {
+    item.addEventListener('click', () => {
+      selectCity(item.dataset.city, item.dataset.country);
+    });
+  });
+}
+
+// ── City picker logic ────────────────────────────────────────────────────────
+document.getElementById('city-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  const filtered = allCities.filter(c =>
+    c.city.toLowerCase().includes(q) || c.region.toLowerCase().includes(q)
+  );
+  renderCityList(filtered);
+});
+
+document.getElementById('manual-go').addEventListener('click', () => {
+  const city    = document.getElementById('manual-city').value.trim();
+  const country = document.getElementById('manual-country').value.trim().toUpperCase() || 'PK';
+  if (city) selectCity(city, country);
+});
+
+document.getElementById('manual-city').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('manual-go').click();
+});
+
+document.getElementById('change-city-btn').addEventListener('click', () => {
+  document.getElementById('city-overlay').classList.remove('hidden');
+  document.getElementById('city-search').value = '';
+  renderCityList(allCities);
+  setTimeout(() => document.getElementById('city-search').focus(), 100);
+});
+
+document.getElementById('retry-btn').addEventListener('click', () => {
+  if (currentCity) fetchTimes(currentCity, currentCountry);
+});
+
+function selectCity(city, country) {
+  document.getElementById('city-overlay').classList.add('hidden');
+  currentCity    = city;
+  currentCountry = country;
+  fetchTimes(city, country);
+}
+
+// ── Fetch prayer times ───────────────────────────────────────────────────────
+async function fetchTimes(city, country) {
+  showState('loading');
+  document.getElementById('current-city-label').textContent = city;
+  try {
+    const res  = await fetch(`${API_BASE}/api/times?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to fetch');
+    appData = data;
+    renderAll(data);
+    showState('data');
+    startClock(data);
+  } catch(err) {
+    document.getElementById('error-msg').textContent = err.message;
+    showState('error');
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderAll(data) {
+  // Hero
+  document.getElementById('hero-city').textContent = data.city;
+  cityTimezone = data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.getElementById('hero-city-sub').textContent =
+    `${data.country}  ·  ${cityTimezone}`;
+
+  // Hijri
+  const h = data.date.hijri;
+  document.getElementById('hijri-date').textContent =
+    `${h.day} ${h.month.en} ${h.year} AH`;
+  // Show moon sighting note if date was adjusted from Saudi calendar
+  const sightingNote = h.adjustment !== 0
+    ? `  ·  Local moon sighting (${h.adjustment > 0 ? '+' : ''}${h.adjustment}d from Saudi)`
+    : '';
+  document.getElementById('hijri-en').textContent =
+    `${h.month.ar} ${h.year}  ·  ${data.date.gregorian.weekday}, ${data.date.gregorian.day} ${data.date.gregorian.month} ${data.date.gregorian.year} ${sightingNote}`;
+
+  // Ramadan
+  if (h.isRamadan) {
+    document.getElementById('ramadan-banner').classList.add('visible');
+    document.getElementById('ramadan-day-ar').textContent = `اليوم ${h.day} من رمضان`;
+    document.getElementById('sehr-hanafi').textContent    = data.hanafi.imsak;
+    document.getElementById('sehr-hanafi-12').textContent = to12(data.hanafi.imsak);
+    document.getElementById('sehr-jafari').textContent    = data.jafari.imsak;
+    document.getElementById('sehr-jafari-12').textContent = to12(data.jafari.imsak);
+    document.getElementById('iftar-hanafi').textContent   = data.hanafi.maghrib;
+    document.getElementById('iftar-hanafi-12').textContent= to12(data.hanafi.maghrib);
+    document.getElementById('iftar-jafari').textContent   = data.jafari.maghrib;
+    document.getElementById('iftar-jafari-12').textContent= to12(data.jafari.maghrib);
+  } else {
+    document.getElementById('ramadan-banner').classList.remove('visible');
+  }
+
+  renderPrayerCards();
+  renderCompareTable();
+}
+
+function renderPrayerCards() {
+  if (!appData) return;
+  const grid    = document.getElementById('prayers-grid');
+  const nowMins = nowMinsInTZ(cityTimezone);
+  const src     = activeFiqh === 'jafari' ? appData.jafari : appData.hanafi;
+  const src2    = activeFiqh === 'both'   ? appData.jafari : null;
+  const activeI = getActiveIndex(src, nowMins);
+
+  grid.innerHTML = PRAYERS.map((p, i) => {
+    const t     = src[p.key] || '--:--';
+    const t2    = src2 ? src2[p.key] : null;
+    const active = i === activeI;
+    const passed = i < activeI;
+
+    return `<div class="prayer-card ${active?'active':''} ${passed?'passed':''}"
+      style="--prayer-color:${p.color}">
+      ${active ? '<div class="now-badge">NOW</div>' : ''}
+      <div class="prayer-arabic">${p.ar}</div>
+      <div class="prayer-en">${p.en}</div>
+      <div class="prayer-time24" style="color:${p.color}">${t}</div>
+      <div class="prayer-time12">${to12(t)}</div>
+      ${t2 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px">
+        <span class="fiqh-badge hanafi" style="margin-right:4px">H</span>${src[p.key]}
+        &nbsp;&nbsp;
+        <span class="fiqh-badge jafari" style="margin-right:4px">J</span>${t2}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderCompareTable() {
+  if (!appData) return;
+  const nowMins = nowMinsInTZ(cityTimezone);
+  const activeI = getActiveIndex(appData.hanafi, nowMins);
+  const tbody   = document.getElementById('compare-tbody');
+
+  tbody.innerHTML = PRAYERS.map((p, i) => {
+    const ht   = appData.hanafi[p.key] || '--:--';
+    const jt   = appData.jafari[p.key] || '--:--';
+    const diff = timeDiff(ht, jt);
+    const active = i === activeI;
+    return `<tr class="${active?'active-row':''}">
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="prayer-dot" style="background:${p.color}"></div>
+          <div>
+            <div style="font-weight:500">${p.en}</div>
+            <div class="arabic-small">${p.ar}</div>
+          </div>
+        </div>
+      </td>
+      <td class="time-cell hanafi-cell">${ht}<div style="font-size:11px;color:var(--text3)">${to12(ht)}</div></td>
+      <td class="time-cell jafari-cell">${jt}<div style="font-size:11px;color:var(--text3)">${to12(jt)}</div></td>
+      <td class="diff-cell">${diff}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Fiqh tabs ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('.fiqh-tab').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.fiqh-tab').forEach(b => b.classList.remove('active','hanafi','jafari'));
+    this.classList.add('active');
+    if (this.dataset.fiqh !== 'both') this.classList.add(this.dataset.fiqh);
+    activeFiqh = this.dataset.fiqh;
+    renderPrayerCards();
+  });
+});
+
+// ── Clock & next prayer ───────────────────────────────────────────────────────
+function startClock(data) {
+  if (clockInterval) clearInterval(clockInterval);
+  updateClock(data);
+  clockInterval = setInterval(() => updateClock(data), 1000);
+}
+
+function updateClock(data) {
+  const tz  = cityTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false
+  }).formatToParts(new Date());
+  const dParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, weekday:'long', day:'numeric', month:'long', year:'numeric'
+  }).formatToParts(new Date());
+
+  const timeStr = tParts.filter(p => p.type !== 'literal' || p.value === ':')
+                        .map(p => p.value).join('');
+  const dateStr = dParts.map(p => p.value).join('');
+
+  document.getElementById('hero-clock').textContent = timeStr;
+  document.getElementById('hero-date').textContent  = dateStr;
+
+  // Check notifications every minute (only on second=0)
+  const sec = parseInt(tParts.find(p => p.type === 'second').value);
+  if (sec === 0) checkAndNotify(appData);
+
+  if (!data) return;
+  const nowMins = nowMinsInTZ(tz);
+  const src     = appData.hanafi;
+  const activeI = getActiveIndex(src, nowMins);
+  const nextI   = (activeI + 1) % PRAYERS.length;
+  const nextP   = PRAYERS[nextI];
+  const nextT   = src[nextP.key] || '--:--';
+  let nextMins  = toMins(nextT);
+  if (nextMins <= nowMins) nextMins += 1440;
+  const diff    = nextMins - nowMins;
+  const h       = Math.floor(diff / 60), m = diff % 60;
+
+  document.getElementById('next-name').textContent  = `${nextP.ar}  ${nextP.en}`;
+  document.getElementById('next-time').textContent  = `${nextT}  ·  ${to12(nextT)}`;
+  document.getElementById('countdown-val').textContent = h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function to12(t) {
+  if (!t || t === '--:--') return '';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  return `${h%12||12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function toMins(t) {
+  if (!t || t.length < 5) return 0;
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function timeDiff(a, b) {
+  const d = toMins(b) - toMins(a);
+  if (d === 0) return '—';
+  const abs = Math.abs(d);
+  return `${d > 0 ? '+' : '−'}${abs}m`;
+}
+
+function getActiveIndex(timings, nowMins) {
+  const keys = PRAYERS.map(p => toMins(timings[p.key] || '0:00'));
+  let idx = -1;
+  for (let i = keys.length - 1; i >= 0; i--) {
+    if (nowMins >= keys[i]) { idx = i; break; }
+  }
+  return idx === -1 ? keys.length - 1 : idx;
+}
+
+function showState(state) {
+  document.getElementById('loading-state').style.display = state === 'loading' ? 'flex'  : 'none';
+  document.getElementById('error-state').style.display   = state === 'error'   ? 'block' : 'none';
+  document.getElementById('data-content').style.display  = state === 'data'    ? 'block' : 'none';
+  const wrap = document.getElementById('main-wrap');
+  if (state === 'data') wrap.classList.add('visible');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadCityList();
+initNotifications();
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, duration = 4000) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 350);
+  }, duration);
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+function initNotifications() {
+  const btn = document.getElementById('notif-btn');
+  if (!('Notification' in window)) {
+    btn.style.display = 'none';
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    notifGranted = true;
+    notifEnabled = true;
+    setNotifBtnState('active');
+  } else if (Notification.permission === 'denied') {
+    setNotifBtnState('denied');
+  }
+  btn.addEventListener('click', toggleNotifications);
+}
+
+async function toggleNotifications() {
+  if (Notification.permission === 'denied') {
+    showToast('⚠️ Notifications blocked. Please enable in browser site settings.');
+    return;
+  }
+  // Already granted by browser — just toggle the in-app enabled state
+  if (Notification.permission === 'granted') {
+    notifGranted = true;
+    if (!notifEnabled) {
+      notifEnabled = true;
+      setNotifBtnState('active');
+      showToast('🔔 Prayer notifications enabled!');
+    } else {
+      notifEnabled = false;
+      setNotifBtnState('');
+      showToast('🔕 Notifications disabled.');
+    }
+    return;
+  }
+  // Permission not yet asked — request it
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    notifGranted = true;
+    notifEnabled = true;
+    setNotifBtnState('active');
+    showToast('🔔 Prayer notifications enabled!');
+  } else {
+    setNotifBtnState('denied');
+    showToast('Notifications permission denied.');
+  }
+}
+
+function setNotifBtnState(state) {
+  const btn  = document.getElementById('notif-btn');
+  const icon = document.getElementById('notif-icon');
+  const lbl  = document.getElementById('notif-label');
+  btn.className = 'notif-btn' + (state ? ' ' + state : '');
+  if (state === 'active') { icon.textContent = '🔔'; if(lbl) lbl.textContent = 'On'; }
+  else if (state === 'denied') { icon.textContent = '🔕'; if(lbl) lbl.textContent = 'Blocked'; }
+  else { icon.textContent = '🔔'; if(lbl) lbl.textContent = 'Notify'; }
+}
+
+function checkAndNotify(data) {
+  if (!notifEnabled || !notifGranted || !data) return;
+
+  const tz     = cityTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const hhmm   = nowHHMMInTZ(tz);
+  const todayKey = new Intl.DateTimeFormat('en-GB', { timeZone: tz,
+    year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+
+  // Reset fired set each new day
+  if (!firedToday._day || firedToday._day !== todayKey) {
+    firedToday = new Set();
+    firedToday._day = todayKey;
+  }
+
+  const isRamadan = data.date?.hijri?.isRamadan;
+
+  // Build list of times to notify
+  const checks = [
+    { key: 'fajr_h',    time: data.hanafi.fajr,    title: '🕌 Fajr (Hanafi)',    body: 'Time for Fajr prayer — Hanafi' },
+    { key: 'fajr_j',    time: data.jafari.fajr,    title: '🕌 Fajr (Jafari)',    body: 'Time for Fajr prayer — Jafari' },
+    { key: 'dhuhr_h',   time: data.hanafi.dhuhr,   title: '🕌 Dhuhr (Hanafi)',   body: 'Time for Dhuhr prayer — Hanafi' },
+    { key: 'dhuhr_j',   time: data.jafari.dhuhr,   title: '🕌 Dhuhr (Jafari)',   body: 'Time for Dhuhr prayer — Jafari' },
+    { key: 'asr_h',     time: data.hanafi.asr,     title: '🕌 Asr (Hanafi)',     body: 'Time for Asr prayer — Hanafi' },
+    { key: 'asr_j',     time: data.jafari.asr,     title: '🕌 Asr (Jafari)',     body: 'Time for Asr prayer — Jafari' },
+    { key: 'maghrib_h', time: data.hanafi.maghrib,  title: '🕌 Maghrib (Hanafi)', body: 'Time for Maghrib prayer — Hanafi' },
+    { key: 'maghrib_j', time: data.jafari.maghrib,  title: '🕌 Maghrib (Jafari)', body: 'Time for Maghrib prayer — Jafari' },
+    { key: 'isha_h',    time: data.hanafi.isha,    title: '🕌 Isha (Hanafi)',    body: 'Time for Isha prayer — Hanafi' },
+    { key: 'isha_j',    time: data.jafari.isha,    title: '🕌 Isha (Jafari)',    body: 'Time for Isha prayer — Jafari' },
+  ];
+
+  if (isRamadan) {
+    checks.push(
+      { key: 'sehr_h',  time: data.hanafi.imsak,   title: '☽ Sehr ends (Hanafi)',  body: 'Suhoor time is ending — Hanafi' },
+      { key: 'sehr_j',  time: data.jafari.imsak,   title: '☽ Sehr ends (Jafari)',  body: 'Suhoor time is ending — Jafari' },
+      { key: 'iftar_h', time: data.hanafi.maghrib,  title: '🌙 Iftar time (Hanafi)', body: 'Time to break your fast — Hanafi' },
+      { key: 'iftar_j', time: data.jafari.maghrib,  title: '🌙 Iftar time (Jafari)', body: 'Time to break your fast — Jafari' },
+    );
+  }
+
+  checks.forEach(({ key, time, title, body }) => {
+    if (!time || time === '--:--') return;
+    const t = time.substring(0, 5);
+    if (t === hhmm && !firedToday.has(key)) {
+      firedToday.add(key);
+      // In-app toast always
+      showToast(`${title} — ${t}`, 6000);
+      // Browser notification
+      try {
+        new Notification(title, {
+          body,
+          icon: 'icons/icon-192x192.png',
+          badge: 'icons/icon-192x192.png',
+          tag: key,
+        });
+      } catch(e) {}
+    }
+  });
+}
+
+}); // DOMContentLoaded
