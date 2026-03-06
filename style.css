@@ -230,6 +230,43 @@ body::before {
 }
 .brand span { color: var(--gold); }
 
+/* ═══════════════════════════════════════════════════════════════
+   THEME INDICATOR
+═══════════════════════════════════════════════════════════════ */
+.theme-indicator {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-family: var(--ff-body);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: var(--text2);
+  transition: background 2s ease, color 2s ease, border-color 2s ease, opacity 0.4s;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+#theme-icon { font-size: 13px; line-height: 1; }
+#theme-label { opacity: 0.75; }
+
+/* Adapt indicator colours per theme */
+body[data-theme="tahajjud"] .theme-indicator { background: rgba(100,120,255,0.12); border-color: rgba(100,120,255,0.2); color: #a0b0f0; }
+body[data-theme="fajr"]     .theme-indicator { background: rgba(140,80,220,0.12); border-color: rgba(140,80,220,0.2); color: #c0a0e8; }
+body[data-theme="sunrise"]  .theme-indicator { background: rgba(255,140,40,0.14); border-color: rgba(255,140,40,0.2); color: #f0a060; }
+body[data-theme="morning"]  .theme-indicator { background: rgba(180,130,10,0.10); border-color: rgba(180,130,10,0.15); color: #8a6000; }
+body[data-theme="dhuhr"]    .theme-indicator { background: rgba(160,130,0,0.10);  border-color: rgba(160,130,0,0.15);  color: #7a6000; }
+body[data-theme="asr"]      .theme-indicator { background: rgba(255,150,30,0.14); border-color: rgba(255,150,30,0.2); color: #e09030; }
+body[data-theme="maghrib"]  .theme-indicator { background: rgba(220,60,100,0.14); border-color: rgba(220,60,100,0.2); color: #e07090; }
+body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12); border-color: rgba(40,160,160,0.2); color: #60b0b8; }
+
+@media (max-width: 600px) {
+  #theme-label { display: none; }
+  .theme-indicator { padding: 5px 8px; }
+}
+
 .change-city-btn {
   display: flex; align-items: center; gap: 8px;
   background: white;

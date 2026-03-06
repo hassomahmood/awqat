@@ -302,11 +302,23 @@ function getTheme(src, nowMins) {
   return 'tahajjud';
 }
 
+var THEME_META = {"tahajjud":{icon:"☪",label:"Tahajjud"}, "fajr":{icon:"🌌",label:"Fajr"}, "sunrise":{icon:"🌅",label:"Sunrise"}, "morning":{icon:"☀️",label:"Morning"}, "dhuhr":{icon:"🌞",label:"Dhuhr"}, "asr":{icon:"🌇",label:"Asr"}, "maghrib":{icon:"🌆",label:"Maghrib"}, "isha":{icon:"🌙",label:"Isha"}};
+
 function applyTheme(theme) {
   if (theme === lastTheme) return;
   lastTheme = theme;
   document.body.setAttribute('data-theme', theme);
   document.body.style.setProperty('--progress-color', THEME_COLORS[theme] || '#d4a017');
+  // Update top-bar indicator
+  var meta = THEME_META[theme];
+  if (meta) {
+    var el = document.getElementById('theme-indicator');
+    var ic = document.getElementById('theme-icon');
+    var lb = document.getElementById('theme-label');
+    if (el) el.style.display = 'flex';
+    if (ic) ic.textContent = meta.icon;
+    if (lb) lb.textContent = meta.label;
+  }
 }
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
