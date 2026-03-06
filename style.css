@@ -1245,3 +1245,250 @@ body[data-theme] .theme-badge { display: block; }
   .tahajjud-label { font-size: 18px; }
   .tahajjud-icon { font-size: 28px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATED SKY LAYERS
+   Strategy:
+   - body::before  = static gradients/textures (existing, per theme)
+   - body::after   = base sky gradient (existing, per theme)
+   - .sky-anim     = new fixed layer for animated elements (clouds,
+                     stars, rays) injected via JS-free CSS trick:
+                     we use multiple box-shadow and keyframes.
+   Since ::before and ::after are taken, animations are done
+   entirely with CSS on body itself and themed pseudo-layers
+   via animation override on body[data-theme]::before
+═══════════════════════════════════════════════════════════════ */
+
+/* ── KEYFRAMES ───────────────────────────────────────────────── */
+
+/* Stars twinkling — opacity flicker at varied rates */
+@keyframes twinkle-a {
+  0%,100% { opacity: 0.9; transform: scale(1);   }
+  50%      { opacity: 0.2; transform: scale(0.6); }
+}
+@keyframes twinkle-b {
+  0%,100% { opacity: 0.4; transform: scale(0.8); }
+  60%      { opacity: 1;   transform: scale(1.2); }
+}
+@keyframes twinkle-c {
+  0%,100% { opacity: 0.7; }
+  30%      { opacity: 0.1; }
+  70%      { opacity: 1;   }
+}
+
+/* Stars slowly drifting across sky (very slow) */
+@keyframes star-drift {
+  from { background-position: 0 0,   200px 100px, 400px 50px,  100px 300px; }
+  to   { background-position: 60px 20px, 260px 80px, 460px 30px, 160px 280px; }
+}
+
+/* Moon glow pulse */
+@keyframes moon-glow {
+  0%,100% { opacity: 0.6; filter: blur(30px); }
+  50%      { opacity: 1;   filter: blur(40px); }
+}
+
+/* Fajr horizon glow rising */
+@keyframes horizon-rise {
+  0%,100% { opacity: 0.5; transform: scaleY(1);   }
+  50%      { opacity: 0.9; transform: scaleY(1.1); }
+}
+
+/* Cloud drift — slow left-to-right float */
+@keyframes cloud-drift-1 {
+  from { background-position: -200px 15%, 600px 35%, 200px 55%; }
+  to   { background-position:  900px 15%, 1700px 35%, 1100px 55%; }
+}
+@keyframes cloud-drift-2 {
+  from { background-position: 300px 20%, -100px 45%, 700px 60%; }
+  to   { background-position: 1400px 20%, 900px 45%, 1800px 60%; }
+}
+@keyframes cloud-drift-slow {
+  from { background-position: 0px 25%, 500px 50%; }
+  to   { background-position: 1200px 25%, 1700px 50%; }
+}
+
+/* Sun rays rotating slowly */
+@keyframes sun-rays {
+  from { transform: rotate(0deg)   scale(1);   opacity: 0.6; }
+  50%  { transform: rotate(180deg) scale(1.05); opacity: 0.9; }
+  to   { transform: rotate(360deg) scale(1);   opacity: 0.6; }
+}
+
+/* Sunrise horizon pulse */
+@keyframes sunrise-pulse {
+  0%,100% { opacity: 0.5; }
+  50%      { opacity: 1;   }
+}
+
+/* Asr heat shimmer — very subtle vertical oscillation */
+@keyframes heat-shimmer {
+  0%,100% { background-position: 0% 0%,  100% 100%; }
+  50%      { background-position: 5%  3%, 95%  97%;  }
+}
+
+/* Maghrib horizon fade — crimson bleeds up then recedes */
+@keyframes maghrib-bleed {
+  0%,100% { opacity: 0.7; background-position: 50% 0%,  90% 20%; }
+  50%      { opacity: 1;   background-position: 50% 5%,  90% 10%; }
+}
+
+/* Isha aurora-like shimmer */
+@keyframes aurora {
+  0%,100% { background-position: 0%   30%, 100% 60%; opacity: 0.6; }
+  33%      { background-position: 30%  20%, 70%  70%; opacity: 0.9; }
+  66%      { background-position: 60%  40%, 40%  50%; opacity: 0.7; }
+}
+
+/* ── TAHAJJUD — twinkling stars drifting ────────────────────── */
+body[data-theme="tahajjud"]::before {
+  animation: star-drift 120s linear infinite;
+  /* layered star dots at different positions/sizes */
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(80,60,180,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(30,50,120,0.15) 0%, transparent 60%),
+    /* star field A — small bright */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Ccircle cx='20'  cy='30'  r='1.2' fill='rgba(255,255,255,0.9)'/%3E%3Ccircle cx='80'  cy='15'  r='0.8' fill='rgba(200,220,255,0.7)'/%3E%3Ccircle cx='150' cy='45'  r='1.5' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='170' cy='10'  r='1'   fill='rgba(180,200,255,0.9)'/%3E%3Ccircle cx='50'  cy='80'  r='0.8' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='70'  r='1.2' fill='rgba(220,230,255,0.8)'/%3E%3Ccircle cx='250' cy='90'  r='1'   fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='10'  cy='120' r='1.5' fill='rgba(200,210,255,0.9)'/%3E%3Ccircle cx='90'  cy='140' r='0.8' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='200' cy='160' r='1.2' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='270' cy='50'  r='1'   fill='rgba(180,200,255,0.6)'/%3E%3Ccircle cx='230' cy='200' r='1.5' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='60'  cy='250' r='0.8' fill='rgba(200,220,255,0.5)'/%3E%3Ccircle cx='140' cy='220' r='1'   fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='290' cy='280' r='1.2' fill='rgba(220,230,255,0.6)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 300px 300px;
+}
+
+/* Tahajjud moon glow (::after carries the gradient sky + glow) */
+body[data-theme="tahajjud"]::after {
+  background:
+    radial-gradient(ellipse 20% 15% at 75% 8%, rgba(200,210,255,0.18) 0%, transparent 100%),
+    linear-gradient(180deg, #050a14 0%, #0a1428 40%, #0d1a36 100%);
+  animation: moon-glow 6s ease-in-out infinite;
+}
+
+/* ── FAJR — horizon rising glow + fading stars ──────────────── */
+body[data-theme="fajr"]::before {
+  animation: horizon-rise 8s ease-in-out infinite;
+  background-image:
+    radial-gradient(ellipse 100% 30% at 50% 100%, rgba(140,60,200,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 50% 0%,   rgba(120,80,200,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 10% 100%, rgba(60,40,140,0.15) 0%, transparent 60%),
+    /* fading stars */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Ccircle cx='30'  cy='20'  r='1'   fill='rgba(255,255,255,0.4)'/%3E%3Ccircle cx='100' cy='10'  r='1.5' fill='rgba(200,200,255,0.3)'/%3E%3Ccircle cx='200' cy='30'  r='1'   fill='rgba(255,255,255,0.35)'/%3E%3Ccircle cx='300' cy='15'  r='0.8' fill='rgba(220,220,255,0.3)'/%3E%3Ccircle cx='370' cy='25'  r='1.2' fill='rgba(255,255,255,0.25)'/%3E%3Ccircle cx='150' cy='50'  r='0.8' fill='rgba(200,200,255,0.2)'/%3E%3Ccircle cx='250' cy='60'  r='1'   fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, 400px 200px;
+}
+body[data-theme="fajr"]::after {
+  background:
+    radial-gradient(ellipse 80% 25% at 50% 100%, rgba(160,80,220,0.4) 0%, transparent 70%),
+    linear-gradient(180deg, #0a0a1e 0%, #181030 50%, #200a28 100%);
+  animation: horizon-rise 10s ease-in-out infinite;
+}
+
+/* ── SUNRISE — animated amber horizon burst ─────────────────── */
+body[data-theme="sunrise"]::before {
+  animation: sunrise-pulse 4s ease-in-out infinite;
+  background-image:
+    radial-gradient(ellipse 120% 50% at 50% 100%, rgba(255,180,60,0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 80%  30% at 50% 95%,  rgba(255,100,20,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse 60%  40% at 80% 10%,  rgba(255,80,40,0.20)  0%, transparent 50%);
+  background-size: auto;
+}
+body[data-theme="sunrise"]::after {
+  background:
+    /* sun disc glow */
+    radial-gradient(ellipse 15% 10% at 50% 92%, rgba(255,220,100,0.7) 0%, transparent 100%),
+    linear-gradient(180deg, #2a0800 0%, #401400 30%, #180800 100%);
+  animation: sunrise-pulse 5s ease-in-out infinite;
+}
+
+/* ── MORNING — gentle clouds drifting ───────────────────────── */
+body[data-theme="morning"]::before {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 60% 0%, rgba(255,200,80,0.20) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 10% 100%, rgba(180,140,40,0.10) 0%, transparent 60%),
+    /* cloud shapes via blurred radials tiled */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='200'%3E%3Cellipse cx='120' cy='60' rx='90' ry='28' fill='rgba(255,255,255,0.55)'/%3E%3Cellipse cx='200' cy='55' rx='60' ry='22' fill='rgba(255,255,255,0.45)'/%3E%3Cellipse cx='160' cy='70' rx='70' ry='20' fill='rgba(255,255,255,0.4)'/%3E%3Cellipse cx='450' cy='80' rx='110' ry='30' fill='rgba(255,255,255,0.5)'/%3E%3Cellipse cx='540' cy='75' rx='70' ry='22' fill='rgba(255,255,255,0.4)'/%3E%3Cellipse cx='490' cy='90' rx='80' ry='18' fill='rgba(255,255,255,0.35)'/%3E%3Cellipse cx='720' cy='50' rx='80' ry='25' fill='rgba(255,255,255,0.5)'/%3E%3Cellipse cx='790' cy='45' rx='50' ry='18' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(180,140,40,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: auto, auto, 800px 200px, 60px 60px;
+  animation: cloud-drift-1 90s linear infinite;
+}
+
+/* ── DHUHR — sun rays + sharp light ─────────────────────────── */
+body[data-theme="dhuhr"]::before {
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255,230,100,0.22) 0%, transparent 55%),
+    /* sun position high centre */
+    radial-gradient(circle 8% at 50% 2%, rgba(255,240,160,0.6) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 80% at 90% 80%, rgba(180,160,60,0.10) 0%, transparent 60%),
+    /* light clouds */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='150'%3E%3Cellipse cx='200' cy='50' rx='80' ry='20' fill='rgba(255,255,255,0.6)'/%3E%3Cellipse cx='260' cy='46' rx='55' ry='16' fill='rgba(255,255,255,0.5)'/%3E%3Cellipse cx='600' cy='60' rx='90' ry='22' fill='rgba(255,255,255,0.55)'/%3E%3Cellipse cx='670' cy='56' rx='60' ry='16' fill='rgba(255,255,255,0.45)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(100,80,0,0.025)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, 800px 150px, 60px 60px;
+  animation: cloud-drift-slow 120s linear infinite;
+}
+body[data-theme="dhuhr"]::after {
+  background:
+    /* sun disc */
+    radial-gradient(circle 12% at 50% 1%, rgba(255,250,200,0.5) 0%, rgba(255,230,100,0.2) 50%, transparent 100%),
+    linear-gradient(180deg, #fffef5 0%, #f8f0dc 100%);
+  animation: sun-rays 40s linear infinite;
+  transform-origin: 50% 1%;
+}
+
+/* ── ASR — golden clouds + warm haze ───────────────────────── */
+body[data-theme="asr"]::before {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 80% 10%, rgba(255,160,40,0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 60% at 20% 90%, rgba(180,80,20,0.18) 0%, transparent 60%),
+    /* golden-tinted clouds low on horizon */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='300'%3E%3Cellipse cx='100' cy='220' rx='120' ry='35' fill='rgba(255,160,40,0.18)'/%3E%3Cellipse cx='180' cy='210' rx='80'  ry='25' fill='rgba(255,140,30,0.14)'/%3E%3Cellipse cx='400' cy='240' rx='140' ry='40' fill='rgba(255,150,30,0.16)'/%3E%3Cellipse cx='500' cy='230' rx='90'  ry='28' fill='rgba(240,130,20,0.12)'/%3E%3Cellipse cx='700' cy='200' rx='100' ry='30' fill='rgba(255,160,40,0.15)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 800px 300px;
+  animation: cloud-drift-2 100s linear infinite;
+}
+body[data-theme="asr"]::after {
+  background:
+    radial-gradient(ellipse 60% 20% at 85% 5%, rgba(255,180,60,0.35) 0%, transparent 70%),
+    linear-gradient(180deg, #280e00 0%, #401800 40%, #200a00 100%);
+  animation: heat-shimmer 15s ease-in-out infinite;
+}
+
+/* ── MAGHRIB — crimson horizon bleeding upward ──────────────── */
+body[data-theme="maghrib"]::before {
+  background-image:
+    radial-gradient(ellipse 100% 45% at 50% 100%, rgba(220,60,60,0.50) 0%, transparent 60%),
+    radial-gradient(ellipse 80%  50% at 50% 0%,   rgba(220,60,60,0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 60%  40% at 90% 20%,  rgba(180,40,100,0.22) 0%, transparent 50%),
+    radial-gradient(ellipse 60%  60% at 10% 80%,  rgba(80,20,80,0.18) 0%, transparent 60%),
+    /* silhouette cloud band at horizon */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Cellipse cx='150' cy='320' rx='160' ry='30' fill='rgba(80,0,30,0.5)'/%3E%3Cellipse cx='280' cy='310' rx='120' ry='25' fill='rgba(100,0,40,0.4)'/%3E%3Cellipse cx='500' cy='330' rx='180' ry='35' fill='rgba(80,0,30,0.45)'/%3E%3Cellipse cx='680' cy='315' rx='130' ry='28' fill='rgba(100,0,40,0.4)'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, auto, 800px 400px;
+  animation: maghrib-bleed 8s ease-in-out infinite;
+}
+body[data-theme="maghrib"]::after {
+  background:
+    /* sun at horizon glow */
+    radial-gradient(ellipse 25% 12% at 50% 98%, rgba(255,140,60,0.7) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,40,40,0.4)  0%, transparent 70%),
+    linear-gradient(180deg, #200008 0%, #380010 40%, #180010 100%);
+  animation: maghrib-bleed 10s ease-in-out infinite;
+}
+
+/* ── ISHA — aurora shimmer + early stars ────────────────────── */
+body[data-theme="isha"]::before {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(20,100,100,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(10,60,80,0.18) 0%, transparent 60%),
+    /* early stars appearing */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Ccircle cx='50'  cy='30'  r='1'   fill='rgba(160,220,220,0.6)'/%3E%3Ccircle cx='130' cy='15'  r='1.5' fill='rgba(180,230,230,0.5)'/%3E%3Ccircle cx='220' cy='40'  r='0.8' fill='rgba(160,220,220,0.4)'/%3E%3Ccircle cx='320' cy='20'  r='1.2' fill='rgba(180,230,230,0.6)'/%3E%3Ccircle cx='380' cy='55'  r='1'   fill='rgba(160,220,220,0.5)'/%3E%3Ccircle cx='80'  cy='100' r='0.8' fill='rgba(180,230,230,0.3)'/%3E%3Ccircle cx='200' cy='80'  r='1'   fill='rgba(160,220,220,0.4)'/%3E%3Ccircle cx='350' cy='110' r='1.5' fill='rgba(180,230,230,0.5)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 400px 300px;
+  animation: aurora 20s ease-in-out infinite;
+}
+body[data-theme="isha"]::after {
+  background:
+    radial-gradient(ellipse 80% 30% at 30% 20%, rgba(20,120,100,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 60%, rgba(10,80,100,0.15) 0%, transparent 70%),
+    linear-gradient(180deg, #020c0e 0%, #061418 50%, #04101a 100%);
+  animation: aurora 25s ease-in-out infinite reverse;
+}
+
+/* ── Respect reduced motion preference ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme]::before,
+  body[data-theme]::after {
+    animation: none !important;
+  }
+}
