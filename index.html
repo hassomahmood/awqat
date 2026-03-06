@@ -994,6 +994,9 @@ let appData    = null;
 let activeFiqh = 'hanafi';
 let currentCity, currentCountry;
 let clockInterval;
+let notifEnabled = false;
+let notifGranted = false;
+let firedToday   = new Set();
 
 // ── City list ────────────────────────────────────────────────────────────────
 let allCities = [];
@@ -1291,10 +1294,6 @@ function showToast(msg, duration = 4000) {
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────
-let notifEnabled = false;
-let notifGranted = false;
-let firedToday   = new Set(); // track which prayers already notified today
-
 function initNotifications() {
   const btn = document.getElementById('notif-btn');
   if (!('Notification' in window)) {
