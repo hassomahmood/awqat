@@ -815,313 +815,7 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
   .brand { font-size: 19px; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   THEME ENGINE — body gets data-theme attribute each prayer period
-   Transitions are smooth via CSS custom property interpolation
-═══════════════════════════════════════════════════════════════ */
-body {
-  transition:
-    background-color 90s ease,
-    color 2s ease;
-}
 
-/* Sky canvas behind everything — animated gradient */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 1;
-  transition: background 90s ease, opacity 2s ease;
-}
-
-/* ── TAHAJJUD  (post-Isha → Fajr, deep midnight) ────────────── */
-body[data-theme="tahajjud"] {
-  background: #080c18;
-  color: #d0d8f0;
-}
-body[data-theme="tahajjud"]::before {
-  background-image:
-    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(80,60,180,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(30,50,120,0.15) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Ccircle cx='20' cy='30' r='1' fill='rgba(255,255,255,0.4)'/%3E%3Ccircle cx='80' cy='15' r='1.5' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='150' cy='45' r='1' fill='rgba(255,255,255,0.3)'/%3E%3Ccircle cx='170' cy='10' r='2' fill='rgba(255,255,255,0.4)'/%3E%3Ccircle cx='50' cy='80' r='1' fill='rgba(255,255,255,0.3)'/%3E%3Ccircle cx='120' cy='70' r='1.5' fill='rgba(255,255,255,0.4)'/%3E%3Ccircle cx='190' cy='90' r='1' fill='rgba(255,255,255,0.3)'/%3E%3Ccircle cx='10' cy='120' r='1.5' fill='rgba(255,255,255,0.4)'/%3E%3Ccircle cx='90' cy='140' r='1' fill='rgba(255,255,255,0.3)'/%3E%3Ccircle cx='160' cy='160' r='2' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
-}
-body[data-theme="tahajjud"]::after {
-  background: linear-gradient(180deg, #050a14 0%, #0a1428 40%, #0d1a36 100%);
-}
-body[data-theme="tahajjud"] .hero-card {
-  background: linear-gradient(135deg, #0d1428 0%, #1a2050 50%, #0d1428 100%);
-}
-body[data-theme="tahajjud"] .prayer-card { background: #0f1a30; border-color: rgba(100,120,255,0.1); color: #c8d4f0; }
-body[data-theme="tahajjud"] .compare-table { background: #0f1a30; }
-body[data-theme="tahajjud"] .compare-table thead tr { background: #060e1e; }
-body[data-theme="tahajjud"] .section-title { color: #8090d0; }
-body[data-theme="tahajjud"] .fiqh-tabs { background: #0d1830; }
-body[data-theme="tahajjud"] .top-bar .brand { color: #8090e0; }
-
-/* ── FAJR  (pre-dawn, dark indigo → muted purple) ───────────── */
-body[data-theme="fajr"] {
-  background: #0f0f2a;
-  color: #c8c0e8;
-}
-body[data-theme="fajr"]::before {
-  background-image:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(120,80,200,0.25) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 60% at 10% 100%, rgba(60,40,140,0.15) 0%, transparent 60%);
-}
-body[data-theme="fajr"]::after {
-  background: linear-gradient(180deg, #0a0a1e 0%, #181030 50%, #200a28 100%);
-}
-body[data-theme="fajr"] .hero-card {
-  background: linear-gradient(135deg, #140a28 0%, #2a1040 50%, #140a28 100%);
-}
-body[data-theme="fajr"] .prayer-card { background: #160e28; color: #c8c0e8; }
-body[data-theme="fajr"] .compare-table { background: #160e28; }
-body[data-theme="fajr"] .compare-table thead tr { background: #0a0818; }
-body[data-theme="fajr"] .section-title { color: #a080d0; }
-body[data-theme="fajr"] .fiqh-tabs { background: #160e28; }
-
-/* ── SUNRISE  (dawn glow, amber-pink horizon) ───────────────── */
-body[data-theme="sunrise"] {
-  background: #1a0a00;
-  color: #f0d8b0;
-}
-body[data-theme="sunrise"]::before {
-  background-image:
-    radial-gradient(ellipse 100% 40% at 50% 0%, rgba(255,160,40,0.30) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(255,80,40,0.20) 0%, transparent 50%);
-}
-body[data-theme="sunrise"]::after {
-  background: linear-gradient(180deg, #2a0800 0%, #401400 30%, #180800 100%);
-}
-body[data-theme="sunrise"] .hero-card {
-  background: linear-gradient(135deg, #2a0e00 0%, #501a00 40%, #3a1000 100%);
-}
-body[data-theme="sunrise"] .prayer-card { background: #220c00; color: #f0d0a0; }
-body[data-theme="sunrise"] .compare-table { background: #220c00; }
-body[data-theme="sunrise"] .compare-table thead tr { background: #140600; }
-body[data-theme="sunrise"] .section-title { color: #e8a050; }
-body[data-theme="sunrise"] .fiqh-tabs { background: #220c00; }
-
-/* ── MORNING  (Sunrise → Dhuhr, warm gold) ──────────────────── */
-body[data-theme="morning"] {
-  background: #fdf5e0;
-  color: #2a1a00;
-}
-body[data-theme="morning"]::before {
-  background-image:
-    radial-gradient(ellipse 80% 50% at 60% 0%, rgba(255,200,80,0.20) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 60% at 10% 100%, rgba(180,140,40,0.10) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(180,140,40,0.04)' stroke-width='1'/%3E%3C/svg%3E");
-}
-body[data-theme="morning"]::after {
-  background: linear-gradient(180deg, #fff8e8 0%, #fef0c8 100%);
-}
-body[data-theme="morning"] .hero-card {
-  background: linear-gradient(135deg, #1a1000 0%, #2e1e00 50%, #1a1000 100%);
-}
-body[data-theme="morning"] .prayer-card { background: white; }
-body[data-theme="morning"] .compare-table { background: white; }
-body[data-theme="morning"] .section-title { color: #5a3800; }
-body[data-theme="morning"] .fiqh-tabs { background: #f0e4c0; }
-
-/* ── DHUHR  (midday, bright white-gold) ─────────────────────── */
-body[data-theme="dhuhr"] {
-  background: #f8f4ec;
-  color: #1a1a00;
-}
-body[data-theme="dhuhr"]::before {
-  background-image:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255,230,100,0.18) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 80% at 90% 80%, rgba(180,160,60,0.10) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(100,80,0,0.025)' stroke-width='1'/%3E%3C/svg%3E");
-}
-body[data-theme="dhuhr"]::after {
-  background: linear-gradient(180deg, #fffef5 0%, #f8f0dc 100%);
-}
-body[data-theme="dhuhr"] .hero-card {
-  background: linear-gradient(135deg, #1e1800 0%, #302800 50%, #1e1800 100%);
-}
-body[data-theme="dhuhr"] .prayer-card { background: white; }
-body[data-theme="dhuhr"] .compare-table { background: white; }
-body[data-theme="dhuhr"] .section-title { color: #3a3000; }
-body[data-theme="dhuhr"] .fiqh-tabs { background: #ede8d8; }
-
-/* ── ASR  (afternoon, golden hour amber) ────────────────────── */
-body[data-theme="asr"] {
-  background: #1a0c00;
-  color: #f0c880;
-}
-body[data-theme="asr"]::before {
-  background-image:
-    radial-gradient(ellipse 80% 50% at 80% 10%, rgba(255,160,40,0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 60% at 20% 90%, rgba(180,80,20,0.15) 0%, transparent 60%);
-}
-body[data-theme="asr"]::after {
-  background: linear-gradient(180deg, #280e00 0%, #401800 40%, #200a00 100%);
-}
-body[data-theme="asr"] .hero-card {
-  background: linear-gradient(135deg, #281000 0%, #402000 50%, #281000 100%);
-}
-body[data-theme="asr"] .prayer-card { background: #200e00; color: #f0c880; }
-body[data-theme="asr"] .compare-table { background: #200e00; }
-body[data-theme="asr"] .compare-table thead tr { background: #120600; }
-body[data-theme="asr"] .section-title { color: #e8a040; }
-body[data-theme="asr"] .fiqh-tabs { background: #200e00; }
-
-/* ── MAGHRIB  (dusk, crimson-purple sunset) ─────────────────── */
-body[data-theme="maghrib"] {
-  background: #120008;
-  color: #f0b0c0;
-}
-body[data-theme="maghrib"]::before {
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(220,60,60,0.30) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 90% 20%, rgba(180,40,100,0.20) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 60% at 10% 80%, rgba(80,20,80,0.15) 0%, transparent 60%);
-}
-body[data-theme="maghrib"]::after {
-  background: linear-gradient(180deg, #200008 0%, #380010 40%, #180010 100%);
-}
-body[data-theme="maghrib"] .hero-card {
-  background: linear-gradient(135deg, #200010 0%, #400020 50%, #200010 100%);
-}
-body[data-theme="maghrib"] .prayer-card { background: #1a0010; color: #f0b0c0; }
-body[data-theme="maghrib"] .compare-table { background: #1a0010; }
-body[data-theme="maghrib"] .compare-table thead tr { background: #0e0008; }
-body[data-theme="maghrib"] .section-title { color: #e06080; }
-body[data-theme="maghrib"] .fiqh-tabs { background: #1a0010; }
-
-/* ── ISHA  (night, deep teal-ink) ───────────────────────────── */
-body[data-theme="isha"] {
-  background: #040e10;
-  color: #a0c8cc;
-}
-body[data-theme="isha"]::before {
-  background-image:
-    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(20,100,100,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(10,60,80,0.15) 0%, transparent 60%);
-}
-body[data-theme="isha"]::after {
-  background: linear-gradient(180deg, #020c0e 0%, #061418 50%, #04101a 100%);
-}
-body[data-theme="isha"] .hero-card {
-  background: linear-gradient(135deg, #061018 0%, #0e2028 50%, #061018 100%);
-}
-body[data-theme="isha"] .prayer-card { background: #071218; color: #a0c8cc; }
-body[data-theme="isha"] .compare-table { background: #071218; }
-body[data-theme="isha"] .compare-table thead tr { background: #030a0e; }
-body[data-theme="isha"] .section-title { color: #50a0a8; }
-body[data-theme="isha"] .fiqh-tabs { background: #071218; }
-
-/* ── Shared dark-theme overrides ────────────────────────────── */
-body[data-theme="tahajjud"] .prayer-card,
-body[data-theme="fajr"] .prayer-card,
-body[data-theme="sunrise"] .prayer-card,
-body[data-theme="asr"] .prayer-card,
-body[data-theme="maghrib"] .prayer-card,
-body[data-theme="isha"] .prayer-card {
-  border-color: rgba(255,255,255,0.06);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-body[data-theme="tahajjud"] .compare-table tbody tr,
-body[data-theme="fajr"] .compare-table tbody tr,
-body[data-theme="sunrise"] .compare-table tbody tr,
-body[data-theme="asr"] .compare-table tbody tr,
-body[data-theme="maghrib"] .compare-table tbody tr,
-body[data-theme="isha"] .compare-table tbody tr {
-  border-bottom-color: rgba(255,255,255,0.06);
-}
-body[data-theme="tahajjud"] .compare-table tbody tr:hover,
-body[data-theme="fajr"] .compare-table tbody tr:hover,
-body[data-theme="sunrise"] .compare-table tbody tr:hover,
-body[data-theme="asr"] .compare-table tbody tr:hover,
-body[data-theme="maghrib"] .compare-table tbody tr:hover,
-body[data-theme="isha"] .compare-table tbody tr:hover {
-  background: rgba(255,255,255,0.04);
-}
-body[data-theme="tahajjud"] .compare-table tbody td,
-body[data-theme="fajr"] .compare-table tbody td,
-body[data-theme="sunrise"] .compare-table tbody td,
-body[data-theme="asr"] .compare-table tbody td,
-body[data-theme="maghrib"] .compare-table tbody td,
-body[data-theme="isha"] .compare-table tbody td {
-  color: inherit;
-}
-body[data-theme="tahajjud"] .change-city-btn,
-body[data-theme="fajr"] .change-city-btn,
-body[data-theme="sunrise"] .change-city-btn,
-body[data-theme="asr"] .change-city-btn,
-body[data-theme="maghrib"] .change-city-btn,
-body[data-theme="isha"] .change-city-btn {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.7);
-}
-body[data-theme="tahajjud"] .notif-btn,
-body[data-theme="fajr"] .notif-btn,
-body[data-theme="sunrise"] .notif-btn,
-body[data-theme="asr"] .notif-btn,
-body[data-theme="maghrib"] .notif-btn,
-body[data-theme="isha"] .notif-btn {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.7);
-}
-body[data-theme="tahajjud"] .prayer-card.passed,
-body[data-theme="fajr"] .prayer-card.passed,
-body[data-theme="sunrise"] .prayer-card.passed,
-body[data-theme="asr"] .prayer-card.passed,
-body[data-theme="maghrib"] .prayer-card.passed,
-body[data-theme="isha"] .prayer-card.passed {
-  opacity: 0.3;
-}
-body[data-theme="tahajjud"] .prayer-arabic,
-body[data-theme="fajr"] .prayer-arabic,
-body[data-theme="sunrise"] .prayer-arabic,
-body[data-theme="asr"] .prayer-arabic,
-body[data-theme="maghrib"] .prayer-arabic,
-body[data-theme="isha"] .prayer-arabic {
-  color: inherit;
-}
-body[data-theme="tahajjud"] .footer,
-body[data-theme="fajr"] .footer,
-body[data-theme="sunrise"] .footer,
-body[data-theme="asr"] .footer,
-body[data-theme="maghrib"] .footer,
-body[data-theme="isha"] .footer {
-  color: rgba(255,255,255,0.3);
-}
-body[data-theme="tahajjud"] .footer a,
-body[data-theme="fajr"] .footer a,
-body[data-theme="sunrise"] .footer a,
-body[data-theme="asr"] .footer a,
-body[data-theme="maghrib"] .footer a,
-body[data-theme="isha"] .footer a {
-  color: rgba(255,255,255,0.5);
-}
-body[data-theme="tahajjud"] .footer-copy,
-body[data-theme="fajr"] .footer-copy,
-body[data-theme="sunrise"] .footer-copy,
-body[data-theme="asr"] .footer-copy,
-body[data-theme="maghrib"] .footer-copy,
-body[data-theme="isha"] .footer-copy {
-  color: rgba(255,255,255,0.5);
-}
-
-/* Theme label badge */
-.theme-badge {
-  position: fixed; top: 12px; right: 12px;
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 100px;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.4);
-  pointer-events: none;
-  transition: all 2s ease;
-  z-index: 500;
-  display: none;
-}
-body[data-theme] .theme-badge { display: block; }
 
 /* ═══════════════════════════════════════════════════════════════
    PRAYER PROGRESS BAR
@@ -1129,13 +823,6 @@ body[data-theme] .theme-badge { display: block; }
 .prayer-progress-wrap {
   position: relative; z-index: 1;
   margin-bottom: 20px;
-}
-.prayer-progress-bar-track {
-  height: 4px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 6px;
 }
 .prayer-progress-bar {
   height: 4px;
@@ -1188,9 +875,7 @@ body[data-theme] .theme-badge { display: block; }
   pointer-events: none;
 }
 .tahajjud-card.visible { display: flex; animation: fadeIn 0.5s ease; }
-.tahajjud-left {
-  display: flex; align-items: center; gap: 16px; flex-shrink: 0;
-}
+.tahajjud-left { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
 .tahajjud-icon {
   font-size: 36px; color: #8090e0;
   text-shadow: 0 0 20px rgba(100,120,255,0.5);
@@ -1206,8 +891,7 @@ body[data-theme] .theme-badge { display: block; }
   letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px;
 }
 .tahajjud-times {
-  display: flex; align-items: center; gap: 16px; flex: 1;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 16px; flex: 1; flex-wrap: wrap;
 }
 .tahajjud-time-block { text-align: center; }
 .tahajjud-time-label {
@@ -1219,13 +903,8 @@ body[data-theme] .theme-badge { display: block; }
   font-size: 28px; font-weight: 400;
   color: #c0d0ff; letter-spacing: 0.02em; line-height: 1;
 }
-.tahajjud-time-12 {
-  font-size: 11px; color: rgba(160,176,240,0.4); margin-top: 2px;
-}
-.tahajjud-sep {
-  font-size: 18px; color: rgba(100,120,255,0.3);
-  flex-shrink: 0;
-}
+.tahajjud-time-12 { font-size: 11px; color: rgba(160,176,240,0.4); margin-top: 2px; }
+.tahajjud-sep { font-size: 18px; color: rgba(100,120,255,0.3); flex-shrink: 0; }
 .tahajjud-now-badge {
   display: none;
   position: absolute; top: 16px; right: 16px;
@@ -1244,6 +923,640 @@ body[data-theme] .theme-badge { display: block; }
   .tahajjud-sep { display: none; }
   .tahajjud-label { font-size: 18px; }
   .tahajjud-icon { font-size: 28px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME ENGINE v2
+   ---------------------------------------------------------------
+   Every theme defines a set of --t-* custom properties.
+   Every component that changes between themes references those
+   variables. This ensures text, borders, backgrounds, and
+   interactive states all update together as a coherent system.
+
+   Themes:
+     tahajjud  deep midnight blue-navy       (post-Isha → Fajr)
+     fajr      dark indigo, purple horizon   (Fajr → Sunrise)
+     sunrise   warm amber-rose, dawn glow    (first 45 min after Sunrise)
+     morning   soft warm cream, gentle gold  (Sunrise+45 → Dhuhr)
+     dhuhr     bright ivory, strong sun      (Dhuhr → Asr)
+     asr       amber-orange, late sun        (Asr → Maghrib)
+     maghrib   crimson-rose dusk             (Maghrib → Isha)
+     isha      deep teal-navy, calm night    (Isha → Isha+60)
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Global transition for smooth theme shifts ───────────────── */
+body {
+  transition: background-color 8s ease, color 2s ease;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: background 8s ease, opacity 2s ease;
+}
+/* Smooth theme colour transitions on key UI elements only —
+   intentionally NOT applied to ::before/::after pseudos or
+   elements that use display/width toggling (progress bar, tahajjud) */
+.prayer-card, .compare-table, .compare-table tbody td,
+.compare-table thead tr, .compare-table tbody tr,
+.fiqh-tabs, .fiqh-tab, .section-title,
+.brand, .brand span,
+.notif-btn, .change-city-btn, .theme-indicator,
+.footer, .footer-copy, .footer-data, .footer a,
+.prayer-arabic, .prayer-en, .prayer-time12,
+.hijri-date, .hijri-en, .next-name, .next-time,
+.countdown-val, .loader {
+  transition: background-color 2s ease, color 2s ease,
+              border-color 2s ease, box-shadow 2s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME TOKEN DEFINITIONS
+   Each theme sets these CSS vars that every component uses:
+
+   --t-bg            page background
+   --t-surface       card / prayer card background
+   --t-surface2      slightly darker surface (table header, tabs bg)
+   --t-border        standard border
+   --t-border-light  very subtle border
+   --t-text          primary text
+   --t-text2         secondary text
+   --t-text3         muted/hint text
+   --t-accent        primary accent (hijri gold, countdown, section titles)
+   --t-accent2       secondary accent (links, hover, loader)
+   --t-hero-bg       hero card background gradient
+   --t-hanafi        hanafi column color in table
+   --t-jafari        jafari column color in table
+   --t-active-row    active row highlight in compare table
+   --t-tab-text      inactive fiqh tab text
+   --t-tab-hover     inactive fiqh tab hover bg
+═══════════════════════════════════════════════════════════════ */
+
+/* ── TAHAJJUD ─────────────────────────────────────────────────
+   Deep midnight. Stars. Quiet, cool, contemplative.
+   Navy/indigo palette. Silver-blue text. */
+body[data-theme="tahajjud"] {
+  --t-bg:           #07091a;
+  --t-surface:      #0d1230;
+  --t-surface2:     #080e22;
+  --t-border:       rgba(140,160,255,0.12);
+  --t-border-light: rgba(140,160,255,0.07);
+  --t-text:         #c8d4f0;
+  --t-text2:        #8a9ad0;
+  --t-text3:        #5060a0;
+  --t-accent:       #8090e0;
+  --t-accent2:      #6070c0;
+  --t-hero-bg:      linear-gradient(135deg, #0c1230 0%, #182060 50%, #0c1230 100%);
+  --t-hanafi:       #7090e0;
+  --t-jafari:       #a080d0;
+  --t-active-row:   rgba(80,100,220,0.18);
+  --t-tab-text:     #6070a8;
+  --t-tab-hover:    rgba(80,100,200,0.15);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="tahajjud"]::before {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(80,60,180,0.20) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(30,50,120,0.15) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Ccircle cx='20' cy='30' r='1.2' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='80' cy='15' r='0.8' fill='rgba(200,220,255,0.6)'/%3E%3Ccircle cx='150' cy='45' r='1.5' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='170' cy='10' r='1' fill='rgba(180,200,255,0.9)'/%3E%3Ccircle cx='50' cy='80' r='0.8' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='120' cy='70' r='1.2' fill='rgba(220,230,255,0.7)'/%3E%3Ccircle cx='250' cy='90' r='1' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='10' cy='120' r='1.5' fill='rgba(200,210,255,0.8)'/%3E%3Ccircle cx='90' cy='140' r='0.8' fill='rgba(255,255,255,0.4)'/%3E%3Ccircle cx='200' cy='160' r='1.2' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='270' cy='50' r='1' fill='rgba(180,200,255,0.5)'/%3E%3Ccircle cx='230' cy='200' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='140' cy='220' r='1' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='290' cy='270' r='1.2' fill='rgba(220,230,255,0.5)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 300px 300px;
+}
+body[data-theme="tahajjud"]::after {
+  background:
+    radial-gradient(ellipse 22% 16% at 75% 8%, rgba(180,200,255,0.14) 0%, transparent 100%),
+    linear-gradient(180deg, #050a14 0%, #0a1428 40%, #0c1836 100%);
+}
+
+/* ── FAJR ─────────────────────────────────────────────────────
+   Pre-dawn. Dark indigo-purple. Stars fading. Horizon glowing.
+   Purple palette. Soft lavender text. */
+body[data-theme="fajr"] {
+  --t-bg:           #0c0a22;
+  --t-surface:      #140e30;
+  --t-surface2:     #0e0820;
+  --t-border:       rgba(160,120,220,0.15);
+  --t-border-light: rgba(160,120,220,0.08);
+  --t-text:         #ccc0e8;
+  --t-text2:        #9080c0;
+  --t-text3:        #6050a0;
+  --t-accent:       #b090e0;
+  --t-accent2:      #8060c0;
+  --t-hero-bg:      linear-gradient(135deg, #160a30 0%, #2c1050 50%, #160a30 100%);
+  --t-hanafi:       #8090e0;
+  --t-jafari:       #c080e0;
+  --t-active-row:   rgba(120,80,200,0.18);
+  --t-tab-text:     #7060a0;
+  --t-tab-hover:    rgba(120,80,200,0.15);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="fajr"]::before {
+  background-image:
+    radial-gradient(ellipse 100% 35% at 50% 100%, rgba(140,60,200,0.30) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 50% 0%,   rgba(100,70,180,0.20) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 60% at 10% 80%,  rgba(60,40,140,0.12) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Ccircle cx='30' cy='20' r='1' fill='rgba(255,255,255,0.35)'/%3E%3Ccircle cx='110' cy='12' r='1.4' fill='rgba(200,190,255,0.28)'/%3E%3Ccircle cx='210' cy='30' r='0.8' fill='rgba(255,255,255,0.30)'/%3E%3Ccircle cx='310' cy='16' r='1' fill='rgba(220,210,255,0.25)'/%3E%3Ccircle cx='370' cy='28' r='1.2' fill='rgba(255,255,255,0.22)'/%3E%3Ccircle cx='160' cy='55' r='0.8' fill='rgba(200,190,255,0.18)'/%3E%3Ccircle cx='260' cy='65' r='1' fill='rgba(255,255,255,0.25)'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, 400px 200px;
+}
+body[data-theme="fajr"]::after {
+  background:
+    radial-gradient(ellipse 90% 28% at 50% 100%, rgba(160,80,220,0.35) 0%, transparent 70%),
+    linear-gradient(180deg, #080818 0%, #160e2c 50%, #1e0826 100%);
+}
+
+/* ── SUNRISE ──────────────────────────────────────────────────
+   Dawn break. Warm amber-rose. Sky lightening at horizon.
+   Soft, not harsh. Warm ochre text on dark amber background. */
+body[data-theme="sunrise"] {
+  --t-bg:           #1c0e02;
+  --t-surface:      #261408;
+  --t-surface2:     #1a0c04;
+  --t-border:       rgba(240,160,60,0.18);
+  --t-border-light: rgba(240,160,60,0.10);
+  --t-text:         #f0d8a8;
+  --t-text2:        #c8a870;
+  --t-text3:        #906840;
+  --t-accent:       #f0b050;
+  --t-accent2:      #e08030;
+  --t-hero-bg:      linear-gradient(135deg, #2a1200 0%, #4a2000 50%, #2a1200 100%);
+  --t-hanafi:       #f0a050;
+  --t-jafari:       #e07060;
+  --t-active-row:   rgba(240,140,40,0.15);
+  --t-tab-text:     #a07040;
+  --t-tab-hover:    rgba(240,140,40,0.12);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="sunrise"]::before {
+  background-image:
+    radial-gradient(ellipse 110% 40% at 50% 100%, rgba(255,170,50,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 30%  at 50% 92%,  rgba(255,100,30,0.30) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40%  at 80% 15%,  rgba(255,80,40,0.15)  0%, transparent 50%);
+}
+body[data-theme="sunrise"]::after {
+  background:
+    radial-gradient(ellipse 16% 10% at 50% 94%, rgba(255,220,100,0.60) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 30% at 50% 100%, rgba(200,80,20,0.25)   0%, transparent 70%),
+    linear-gradient(180deg, #1a0800 0%, #321200 40%, #1a0800 100%);
+}
+
+/* ── MORNING ──────────────────────────────────────────────────
+   After sunrise, before noon. Warm cream. Bright, fresh, hopeful.
+   Light theme. Amber-brown text. */
+body[data-theme="morning"] {
+  --t-bg:           #fdf6e4;
+  --t-surface:      #ffffff;
+  --t-surface2:     #f5ead0;
+  --t-border:       rgba(160,120,40,0.14);
+  --t-border-light: rgba(160,120,40,0.08);
+  --t-text:         #2e1e00;
+  --t-text2:        #6a4800;
+  --t-text3:        #a07830;
+  --t-accent:       #c08010;
+  --t-accent2:      #2d6a5e;
+  --t-hero-bg:      linear-gradient(135deg, #1e1400 0%, #342200 50%, #1e1400 100%);
+  --t-hanafi:       #1e4a80;
+  --t-jafari:       #5a2880;
+  --t-active-row:   rgba(180,140,40,0.12);
+  --t-tab-text:     #6a4800;
+  --t-tab-hover:    rgba(160,120,40,0.12);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="morning"]::before {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 60% 0%, rgba(255,200,80,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 10% 100%, rgba(180,140,40,0.08) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='200'%3E%3Cellipse cx='120' cy='60' rx='90' ry='28' fill='rgba(255,255,255,0.55)'/%3E%3Cellipse cx='200' cy='55' rx='60' ry='22' fill='rgba(255,255,255,0.45)'/%3E%3Cellipse cx='160' cy='70' rx='70' ry='20' fill='rgba(255,255,255,0.4)'/%3E%3Cellipse cx='450' cy='80' rx='110' ry='30' fill='rgba(255,255,255,0.5)'/%3E%3Cellipse cx='540' cy='75' rx='70' ry='22' fill='rgba(255,255,255,0.4)'/%3E%3Cellipse cx='720' cy='50' rx='80' ry='25' fill='rgba(255,255,255,0.5)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(160,120,40,0.035)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: auto, auto, 800px 200px, 60px 60px;
+}
+body[data-theme="morning"]::after {
+  background: linear-gradient(180deg, #fff8e8 0%, #fdf0cc 100%);
+}
+
+/* ── DHUHR ────────────────────────────────────────────────────
+   High noon. Bright ivory-white. Strong, clear light.
+   Crisp light theme, darker than morning, more contrast. */
+body[data-theme="dhuhr"] {
+  --t-bg:           #f8f4e8;
+  --t-surface:      #ffffff;
+  --t-surface2:     #ede8d4;
+  --t-border:       rgba(120,100,20,0.14);
+  --t-border-light: rgba(120,100,20,0.08);
+  --t-text:         #1e1c00;
+  --t-text2:        #504800;
+  --t-text3:        #907820;
+  --t-accent:       #a07800;
+  --t-accent2:      #2d6a5e;
+  --t-hero-bg:      linear-gradient(135deg, #201c00 0%, #362e00 50%, #201c00 100%);
+  --t-hanafi:       #1e4a80;
+  --t-jafari:       #5a2880;
+  --t-active-row:   rgba(160,130,0,0.10);
+  --t-tab-text:     #504800;
+  --t-tab-hover:    rgba(120,100,20,0.10);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="dhuhr"]::before {
+  background-image:
+    radial-gradient(ellipse 100% 55% at 50% 0%, rgba(255,235,100,0.16) 0%, transparent 55%),
+    radial-gradient(circle    8%    at 50% 2%,  rgba(255,245,160,0.55) 0%, transparent 100%),
+    radial-gradient(ellipse  60% 70% at 90% 80%, rgba(180,160,50,0.08) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='150'%3E%3Cellipse cx='200' cy='50' rx='80' ry='20' fill='rgba(255,255,255,0.65)'/%3E%3Cellipse cx='260' cy='46' rx='55' ry='16' fill='rgba(255,255,255,0.55)'/%3E%3Cellipse cx='600' cy='60' rx='90' ry='22' fill='rgba(255,255,255,0.60)'/%3E%3Cellipse cx='670' cy='56' rx='60' ry='16' fill='rgba(255,255,255,0.50)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(100,80,0,0.022)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, 800px 150px, 60px 60px;
+}
+body[data-theme="dhuhr"]::after {
+  background:
+    radial-gradient(circle 14% at 50% 1%, rgba(255,252,200,0.45) 0%, rgba(255,235,100,0.15) 50%, transparent 100%),
+    linear-gradient(180deg, #fffef5 0%, #f8f0d8 100%);
+}
+
+/* ── ASR ──────────────────────────────────────────────────────
+   Golden hour. Deep warm amber sky. Soft, not harsh.
+   Rich amber/ochre palette. Warm cream text. */
+body[data-theme="asr"] {
+  --t-bg:           #1e1000;
+  --t-surface:      #2a1800;
+  --t-surface2:     #1a0e00;
+  --t-border:       rgba(220,150,40,0.18);
+  --t-border-light: rgba(220,150,40,0.10);
+  --t-text:         #f0d090;
+  --t-text2:        #c0a050;
+  --t-text3:        #806030;
+  --t-accent:       #f0b040;
+  --t-accent2:      #e08020;
+  --t-hero-bg:      linear-gradient(135deg, #2c1600 0%, #4a2800 50%, #2c1600 100%);
+  --t-hanafi:       #f0b860;
+  --t-jafari:       #e88060;
+  --t-active-row:   rgba(220,150,40,0.18);
+  --t-tab-text:     #906830;
+  --t-tab-hover:    rgba(220,140,30,0.15);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="asr"]::before {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 78% 8%,  rgba(255,160,40,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 60% at 20% 88%, rgba(180,80,20,0.14)  0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='300'%3E%3Cellipse cx='100' cy='220' rx='120' ry='35' fill='rgba(255,160,40,0.14)'/%3E%3Cellipse cx='180' cy='210' rx='80' ry='25' fill='rgba(255,140,30,0.10)'/%3E%3Cellipse cx='400' cy='240' rx='140' ry='40' fill='rgba(255,150,30,0.12)'/%3E%3Cellipse cx='700' cy='200' rx='100' ry='30' fill='rgba(255,160,40,0.11)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 800px 300px;
+}
+body[data-theme="asr"]::after {
+  background:
+    radial-gradient(ellipse 55% 18% at 82% 6%, rgba(255,180,60,0.28) 0%, transparent 70%),
+    linear-gradient(180deg, #260e00 0%, #3c1600 40%, #1e0a00 100%);
+}
+
+/* ── MAGHRIB ──────────────────────────────────────────────────
+   Sunset. Crimson-rose horizon, deep violet sky above.
+   Dramatic but not overdone. Rose-pink text palette. */
+body[data-theme="maghrib"] {
+  --t-bg:           #140008;
+  --t-surface:      #1e0012;
+  --t-surface2:     #0e0008;
+  --t-border:       rgba(220,80,120,0.18);
+  --t-border-light: rgba(220,80,120,0.10);
+  --t-text:         #f0c0d0;
+  --t-text2:        #c07090;
+  --t-text3:        #804060;
+  --t-accent:       #f090a0;
+  --t-accent2:      #e06080;
+  --t-hero-bg:      linear-gradient(135deg, #220010 0%, #440022 50%, #220010 100%);
+  --t-hanafi:       #f08090;
+  --t-jafari:       #d060c0;
+  --t-active-row:   rgba(220,60,100,0.18);
+  --t-tab-text:     #904060;
+  --t-tab-hover:    rgba(200,60,100,0.15);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="maghrib"]::before {
+  background-image:
+    radial-gradient(ellipse 100% 42% at 50% 100%, rgba(220,60,60,0.42)  0%, transparent 60%),
+    radial-gradient(ellipse  70% 45% at 50% 0%,   rgba(180,40,80,0.20)  0%, transparent 55%),
+    radial-gradient(ellipse  55% 40% at 88% 18%,  rgba(160,30,90,0.18)  0%, transparent 50%),
+    radial-gradient(ellipse  55% 55% at 12% 75%,  rgba(80,10,70,0.14)   0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Cellipse cx='150' cy='320' rx='160' ry='28' fill='rgba(80,0,30,0.45)'/%3E%3Cellipse cx='280' cy='308' rx='120' ry='22' fill='rgba(100,0,40,0.38)'/%3E%3Cellipse cx='500' cy='330' rx='180' ry='32' fill='rgba(80,0,30,0.40)'/%3E%3Cellipse cx='700' cy='312' rx='130' ry='25' fill='rgba(100,0,40,0.36)'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, auto, 800px 400px;
+}
+body[data-theme="maghrib"]::after {
+  background:
+    radial-gradient(ellipse 26% 12% at 50% 98%, rgba(255,130,50,0.65) 0%, transparent 100%),
+    radial-gradient(ellipse 65% 32% at 50% 100%, rgba(200,40,40,0.35) 0%, transparent 70%),
+    linear-gradient(180deg, #1e0008 0%, #360010 40%, #16000c 100%);
+}
+
+/* ── ISHA ─────────────────────────────────────────────────────
+   Night proper. Deep teal-navy, calm, restful.
+   Teal-aqua text palette. Aurora hints. */
+body[data-theme="isha"] {
+  --t-bg:           #030e10;
+  --t-surface:      #061418;
+  --t-surface2:     #030c0e;
+  --t-border:       rgba(40,160,160,0.15);
+  --t-border-light: rgba(40,160,160,0.08);
+  --t-text:         #a8d0d4;
+  --t-text2:        #608898;
+  --t-text3:        #3a6070;
+  --t-accent:       #60b8c0;
+  --t-accent2:      #2d8a8e;
+  --t-hero-bg:      linear-gradient(135deg, #051018 0%, #0c2030 50%, #051018 100%);
+  --t-hanafi:       #70c0e0;
+  --t-jafari:       #80a8e0;
+  --t-active-row:   rgba(30,140,140,0.18);
+  --t-tab-text:     #406878;
+  --t-tab-hover:    rgba(40,140,140,0.15);
+  background: var(--t-bg);
+  color: var(--t-text);
+}
+body[data-theme="isha"]::before {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 22% 12%, rgba(20,100,100,0.20) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 88%, rgba(10,60,80,0.16)   0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Ccircle cx='50' cy='30' r='1' fill='rgba(140,210,210,0.55)'/%3E%3Ccircle cx='130' cy='15' r='1.5' fill='rgba(160,220,220,0.45)'/%3E%3Ccircle cx='220' cy='40' r='0.8' fill='rgba(140,210,210,0.40)'/%3E%3Ccircle cx='320' cy='20' r='1.2' fill='rgba(160,220,220,0.55)'/%3E%3Ccircle cx='380' cy='55' r='1' fill='rgba(140,210,210,0.45)'/%3E%3Ccircle cx='80' cy='100' r='0.8' fill='rgba(160,220,220,0.28)'/%3E%3Ccircle cx='200' cy='80' r='1' fill='rgba(140,210,210,0.35)'/%3E%3Ccircle cx='350' cy='110' r='1.5' fill='rgba(160,220,220,0.45)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 400px 300px;
+}
+body[data-theme="isha"]::after {
+  background:
+    radial-gradient(ellipse 80% 30% at 28% 18%, rgba(20,120,100,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 72% 62%, rgba(10,80,100,0.14)  0%, transparent 70%),
+    linear-gradient(180deg, #020c0e 0%, #051416 50%, #030e12 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT THEMING — wired to --t-* variables
+   Every element that needs to change between themes lives here.
+   Components are grouped by section for easy reading.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Top bar & brand ─────────────────────────────────────────── */
+body[data-theme] .brand {
+  color: var(--t-text);
+}
+body[data-theme] .brand span {
+  color: var(--t-accent);
+}
+/* Light themes keep default ink brand */
+body[data-theme="morning"] .brand,
+body[data-theme="dhuhr"]   .brand {
+  color: var(--t-text);
+}
+
+/* ── Buttons (notif + city) ──────────────────────────────────── */
+body[data-theme] .notif-btn,
+body[data-theme] .change-city-btn {
+  background:    var(--t-surface);
+  border-color:  var(--t-border);
+  color:         var(--t-text2);
+  box-shadow: none;
+}
+body[data-theme] .notif-btn:hover,
+body[data-theme] .change-city-btn:hover {
+  border-color: var(--t-accent);
+  color:        var(--t-accent);
+}
+body[data-theme] .notif-btn.active {
+  background:   var(--t-surface2);
+  border-color: var(--t-accent);
+  color:        var(--t-accent);
+}
+/* Light themes stay white */
+body[data-theme="morning"] .notif-btn,
+body[data-theme="dhuhr"]   .notif-btn,
+body[data-theme="morning"] .change-city-btn,
+body[data-theme="dhuhr"]   .change-city-btn {
+  background: white;
+  box-shadow: var(--shadow2);
+}
+
+/* ── Theme indicator ─────────────────────────────────────────── */
+body[data-theme] .theme-indicator {
+  background:   var(--t-surface);
+  border-color: var(--t-border);
+  color:        var(--t-text2);
+}
+
+/* ── Loading spinner ─────────────────────────────────────────── */
+body[data-theme] .loader {
+  border-color: var(--t-border);
+  border-top-color: var(--t-accent);
+}
+body[data-theme] .loading-text {
+  color: var(--t-text3);
+}
+
+/* ── Hero card ───────────────────────────────────────────────── */
+body[data-theme] .hero-card {
+  background: var(--t-hero-bg);
+}
+/* Hero text stays white — it's on a dark hero card regardless of theme */
+body[data-theme] .hero-city    { color: white; }
+body[data-theme] .hero-city-sub{ color: rgba(255,255,255,0.40); }
+body[data-theme] .hero-clock   { color: white; }
+body[data-theme] .hero-date    { color: rgba(255,255,255,0.40); }
+body[data-theme] .hero-divider { background: rgba(255,255,255,0.10); }
+
+/* Hijri block */
+body[data-theme] .hijri-date { color: var(--t-accent); }
+body[data-theme] .hijri-en   { color: rgba(255,255,255,0.35); }
+
+/* Next prayer block */
+body[data-theme] .next-prayer-block {
+  background:   rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.10);
+}
+body[data-theme] .next-label     { color: rgba(255,255,255,0.38); }
+body[data-theme] .next-name      { color: white; }
+body[data-theme] .next-time      { color: rgba(255,255,255,0.50); }
+body[data-theme] .countdown-val  { color: var(--t-accent); }
+body[data-theme] .countdown-label{ color: rgba(255,255,255,0.38); }
+body[data-theme] .next-countdown { border-color: rgba(255,255,255,0.10); }
+
+/* Progress bar labels — hero card is always dark regardless of theme */
+body[data-theme] .prayer-progress-labels,
+body[data-theme] #progress-from,
+body[data-theme] #progress-to {
+  color: rgba(255,255,255,0.35) !important;
+}
+body[data-theme] #progress-pct {
+  color: rgba(255,255,255,0.65) !important;
+  font-weight: 500;
+}
+
+/* ── Section titles ──────────────────────────────────────────── */
+body[data-theme] .section-title {
+  color: var(--t-text);
+}
+body[data-theme="morning"] .section-title { color: var(--t-text); }
+body[data-theme="dhuhr"]   .section-title { color: var(--t-text); }
+
+/* ── Fiqh tabs ───────────────────────────────────────────────── */
+body[data-theme] .fiqh-tabs {
+  background: var(--t-surface2);
+  box-shadow: none;
+}
+body[data-theme] .fiqh-tab {
+  color: var(--t-tab-text);
+}
+body[data-theme] .fiqh-tab:not(.active):hover {
+  background: var(--t-tab-hover);
+  color: var(--t-text2);
+}
+/* Active tab states stay branded (hanafi blue / jafari purple) */
+body[data-theme] .fiqh-tab.active.hanafi {
+  background: var(--hanafi);
+  color: white;
+}
+body[data-theme] .fiqh-tab.active.jafari {
+  background: var(--jafari);
+  color: white;
+}
+/* "Both" active tab */
+body[data-theme] .fiqh-tab.active:not(.hanafi):not(.jafari) {
+  background: var(--t-accent);
+  color: white;
+}
+
+/* ── Prayer cards ────────────────────────────────────────────── */
+body[data-theme] .prayer-card {
+  background:   var(--t-surface);
+  border-color: var(--t-border-light);
+  box-shadow:   0 4px 20px rgba(0,0,0,0.25);
+}
+body[data-theme] .prayer-card:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+body[data-theme] .prayer-arabic {
+  color: var(--t-text);
+}
+body[data-theme] .prayer-en {
+  color: var(--t-text3);
+}
+body[data-theme] .prayer-time12 {
+  color: var(--t-text3);
+}
+/* Passed cards */
+body[data-theme] .prayer-card.passed {
+  opacity: 0.35;
+}
+body[data-theme="morning"] .prayer-card.passed,
+body[data-theme="dhuhr"]   .prayer-card.passed {
+  opacity: 0.45;
+}
+/* Light themes get white cards with normal shadows */
+body[data-theme="morning"] .prayer-card,
+body[data-theme="dhuhr"]   .prayer-card {
+  background: white;
+  box-shadow: var(--shadow2);
+  border-color: var(--t-border-light);
+}
+
+/* ── Compare table ───────────────────────────────────────────── */
+body[data-theme] .compare-table {
+  background:   var(--t-surface);
+  border-color: var(--t-border);
+}
+body[data-theme] .compare-table thead tr {
+  background: var(--t-surface2);
+}
+body[data-theme] .compare-table thead th {
+  color: var(--t-text3);
+}
+body[data-theme] .compare-table thead th.hanafi-col {
+  color: var(--t-hanafi);
+}
+body[data-theme] .compare-table thead th.jafari-col {
+  color: var(--t-jafari);
+}
+body[data-theme] .compare-table tbody tr {
+  border-bottom-color: var(--t-border-light);
+}
+body[data-theme] .compare-table tbody tr:hover {
+  background: var(--t-surface2);
+}
+body[data-theme] .compare-table tbody tr.active-row {
+  background: var(--t-active-row);
+}
+body[data-theme] .compare-table tbody td {
+  color: var(--t-text);
+}
+body[data-theme] .compare-table tbody td .arabic-small {
+  color: var(--t-text3);
+}
+body[data-theme] .compare-table tbody td.hanafi-cell {
+  color: var(--t-hanafi);
+}
+body[data-theme] .compare-table tbody td.jafari-cell {
+  color: var(--t-jafari);
+}
+body[data-theme] .compare-table tbody td.diff-cell {
+  color: var(--t-text3);
+}
+/* Light themes keep white bg + readable ink-color cells */
+body[data-theme="morning"] .compare-table,
+body[data-theme="dhuhr"]   .compare-table {
+  background: white;
+  box-shadow: var(--shadow2);
+}
+body[data-theme="morning"] .compare-table thead tr,
+body[data-theme="dhuhr"]   .compare-table thead tr {
+  background: var(--t-surface2);
+}
+body[data-theme="morning"] .compare-table tbody td,
+body[data-theme="dhuhr"]   .compare-table tbody td {
+  color: var(--t-text);
+}
+body[data-theme="morning"] .compare-table tbody td.hanafi-cell,
+body[data-theme="dhuhr"]   .compare-table tbody td.hanafi-cell {
+  color: var(--hanafi);
+}
+body[data-theme="morning"] .compare-table tbody td.jafari-cell,
+body[data-theme="dhuhr"]   .compare-table tbody td.jafari-cell {
+  color: var(--jafari);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+body[data-theme] ::-webkit-scrollbar-thumb {
+  background: var(--t-border);
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+body[data-theme] .footer,
+body[data-theme] .footer-data {
+  color: var(--t-text3);
+}
+body[data-theme] .footer-copy {
+  color: var(--t-text2);
+}
+body[data-theme] .footer a {
+  color: var(--t-accent2);
+}
+body[data-theme="morning"] .footer,
+body[data-theme="morning"] .footer-data,
+body[data-theme="dhuhr"]   .footer,
+body[data-theme="dhuhr"]   .footer-data {
+  color: var(--t-text3);
+}
+body[data-theme="morning"] .footer-copy,
+body[data-theme="dhuhr"]   .footer-copy {
+  color: var(--t-text2);
+}
+
+/* ── Ramadan banner adapts on themed backgrounds ─────────────── */
+body[data-theme] .ramadan-banner {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Reduce motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration:  0.01ms !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
