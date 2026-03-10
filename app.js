@@ -214,6 +214,7 @@ function renderAll(data) {
   renderCompareTable();
   renderDuas();
   renderTracker();
+  setTimeout(tryFetchQibla, 500);
 }
 
 function renderHijri(data) {
@@ -1156,13 +1157,5 @@ async function loadIslamicCalendar(hijriMonth, hijriYear) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// HOOK Qibla into fetchTimes
-// ═══════════════════════════════════════════════════════════════
-// Monkey-patch renderAll to also trigger Qibla
-var _origRenderAll = renderAll;
-renderAll = function(data) {
-  _origRenderAll(data);
-  setTimeout(tryFetchQibla, 500);
-};
+// Qibla hook is called directly from renderAll above
 
