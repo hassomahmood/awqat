@@ -183,6 +183,92 @@ app.get("/api/cities", (req, res) => {
   res.json(CITIES);
 });
 
+
+// ── GET /api/qibla?lat=33.6&lng=73.1 ─────────────────────────────────────────
+app.get("/api/qibla", async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng);
+  if (isNaN(lat) || isNaN(lng)) {
+    return res.status(400).json({ error: "lat and lng are required" });
+  }
+  try {
+    const url  = `https://api.aladhan.com/v1/qibla/${lat}/${lng}`;
+    const r    = await fetch(url, { timeout: 10000 });
+    const json = await r.json();
+    if (!r.ok || json.code !== 200) throw new Error("AlAdhan qibla error");
+    res.json({ direction: json.data.direction });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/timings-by-date?date=15-06-2025&city=Karachi&country=PK ─────────
+// Used by the annual chart (fetches one day per month for a full year view)
+app.get("/api/timings-by-date", async (req, res) => {
+  const { date, city, country } = req.query;
+  if (!date || !city) {
+    return res.status(400).json({ error: "date, city and country are required" });
+  }
+  try {
+    const url  = `https://api.aladhan.com/v1/timingsByCity/${encodeURIComponent(date)}` +
+                 `?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country || "")}` +
+                 `&method=${HANAFI_METHOD}&school=1`;
+    const r    = await fetch(url, { timeout: 10000 });
+    const json = await r.json();
+    if (!r.ok || json.code !== 200) throw new Error("AlAdhan timings error");
+    const t = json.data.timings;
+    const strip = (v) => v ? v.substring(0, 5) : "--:--";
+    res.json({
+      fajr:    strip(t.Fajr),
+      sunrise: strip(t.Sunrise),
+      dhuhr:   strip(t.Dhuhr),
+      asr:     strip(t.Asr),
+      maghrib: strip(t.Maghrib),
+      isha:    strip(t.Isha),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/convert?type=gToH&date=15-06-2025  (or type=hToG) ───────────────
+app.get("/api/convert", async (req, res) => {
+  const { type, date } = req.query;
+  if (!type || !date || !["gToH", "hToG"].includes(type)) {
+    return res.status(400).json({ error: "type (gToH|hToG) and date (DD-MM-YYYY) are required" });
+  }
+  try {
+    const url  = `https://api.aladhan.com/v1/${type}/${encodeURIComponent(date)}`;
+    const r    = await fetch(url, { timeout: 10000 });
+    const json = await r.json();
+    if (!r.ok || json.code !== 200) throw new Error("AlAdhan conversion error");
+    res.json(json.data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/calendar?hijriYear=1446&hijriMonth=9&city=Karachi&country=PK ────
+// Used by Ramadan calendar (month=9) and Islamic monthly calendar (any month)
+app.get("/api/calendar", async (req, res) => {
+  const { hijriYear, hijriMonth, city, country } = req.query;
+  if (!hijriYear || !hijriMonth || !city) {
+    return res.status(400).json({ error: "hijriYear, hijriMonth, city and country are required" });
+  }
+  try {
+    const url  = `https://api.aladhan.com/v1/hijriCalendarByCity/${hijriYear}/${hijriMonth}` +
+                 `?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country || "")}` +
+                 `&method=${HANAFI_METHOD}&school=1`;
+    const r    = await fetch(url, { timeout: 15000 });
+    const json = await r.json();
+    if (!r.ok || !json.data) throw new Error("AlAdhan calendar error");
+    // Pass through the full data array — client handles rendering
+    res.json({ data: json.data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── GET / — health check ──────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.json({ status: "ok", service: "Awqat Al-Salat API" });

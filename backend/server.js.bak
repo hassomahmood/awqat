@@ -58,8 +58,8 @@ function getHijriAdjustment(country) {
   return HIJRI_ADJUSTMENT.hasOwnProperty(code) ? HIJRI_ADJUSTMENT[code] : 0;
 }
 
-// ── Helper: fetch timings from AlAdhan ────────────────────────────────────────
-async function fetchTimings(city, country, method, school = 0, adjustment = 0) {
+// ── Helper: fetch prayer timings from AlAdhan ────────────────────────────────
+async function fetchTimings(city, country, method, school = 0) {
   const today = new Date();
   const dd    = String(today.getDate()).padStart(2, "0");
   const mm    = String(today.getMonth() + 1).padStart(2, "0");
@@ -70,8 +70,7 @@ async function fetchTimings(city, country, method, school = 0, adjustment = 0) {
     `?city=${encodeURIComponent(city)}` +
     `&country=${encodeURIComponent(country)}` +
     `&method=${method}` +
-    `&school=${school}` +
-    `&adjustment=${adjustment}`;  // Hijri date offset from Saudi calendar
+    `&school=${school}`;
 
   const res  = await fetch(url, { timeout: 10000 });
   const json = await res.json();
@@ -81,6 +80,31 @@ async function fetchTimings(city, country, method, school = 0, adjustment = 0) {
   }
 
   return json.data;
+}
+
+// ── Helper: fetch accurate Hijri date with country-specific adjustment ─────────
+// Uses AlAdhan's dedicated Gregorian→Hijri conversion endpoint which correctly
+// applies the adjustment to shift the Hijri date by the given number of days.
+// This is more reliable than passing adjustment= to the timings endpoint.
+async function fetchHijriDate(adjustment) {
+  const today = new Date();
+  // Apply the day offset to the Gregorian date before converting
+  const adjusted = new Date(today);
+  adjusted.setDate(adjusted.getDate() + adjustment);
+
+  const dd   = String(adjusted.getDate()).padStart(2, "0");
+  const mm   = String(adjusted.getMonth() + 1).padStart(2, "0");
+  const yyyy = adjusted.getFullYear();
+
+  const url = `https://api.aladhan.com/v1/gToH/${dd}-${mm}-${yyyy}`;
+  const res  = await fetch(url, { timeout: 10000 });
+  const json = await res.json();
+
+  if (!res.ok || json.code !== 200) {
+    throw new Error("Could not fetch Hijri date");
+  }
+
+  return json.data.hijri;
 }
 
 // ── GET /api/times?city=Islamabad&country=PK ──────────────────────────────────
@@ -95,19 +119,17 @@ app.get("/api/times", async (req, res) => {
   try {
     const adjustment = getHijriAdjustment(country);
 
-    // Fetch both fiqhs in parallel, applying local moon sighting adjustment
-    const [hanafiData, jafariData] = await Promise.all([
-      fetchTimings(city, country, HANAFI_METHOD, 1, adjustment),  // school=1 → Hanafi Asr
-      fetchTimings(city, country, JAFARI_METHOD, 0, adjustment),  // school=0 → Shafi/Jafari Asr
+    // Fetch prayer timings (both fiqhs) and the country-adjusted Hijri date in parallel
+    const [hanafiData, jafariData, hijri] = await Promise.all([
+      fetchTimings(city, country, HANAFI_METHOD, 1),  // school=1 → Hanafi Asr
+      fetchTimings(city, country, JAFARI_METHOD, 0),  // school=0 → Shafi/Jafari Asr
+      fetchHijriDate(adjustment),                      // accurate local-sighting Hijri date
     ]);
 
-    const strip = (t) => (t ? t.substring(0, 5) : "--:--");
-
-    // Shared date info (same for both)
-    const hijri     = hanafiData.date.hijri;
-    const gregorian = hanafiData.date.gregorian;
-    const isRamadan = parseInt(hijri.month.number) === 9;
-    const meta      = hanafiData.meta;
+    const strip      = (t) => (t ? t.substring(0, 5) : "--:--");
+    const gregorian  = hanafiData.date.gregorian;
+    const isRamadan  = parseInt(hijri.month.number) === 9;
+    const meta       = hanafiData.meta;
 
     res.json({
       city,
@@ -125,7 +147,7 @@ app.get("/api/times", async (req, res) => {
           month:      { number: hijri.month.number, en: hijri.month.en, ar: hijri.month.ar },
           year:       hijri.year,
           isRamadan,
-          adjustment, // expose so frontend can show a note if needed
+          adjustment,
         },
       },
       timezone: meta.timezone,

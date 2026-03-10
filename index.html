@@ -13,6 +13,11 @@
 </head>
 <body>
 
+<!-- ══════════════════════════ BISMILLAH ══════════════════════════ -->
+<div class="bismillah-bar">
+  <span class="bismillah-text">بِسْمِ ٱللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
+</div>
+
 <!-- ═══════════════════════════ CITY OVERLAY ═══════════════════════════ -->
 <div id="city-overlay">
   <div class="city-picker-card">
@@ -22,6 +27,11 @@
       <p>أوقات الصلاة  ·  PRAYER TIMES</p>
     </div>
     <div class="city-picker-body">
+      <button class="gps-btn" id="gps-btn">
+        <span class="gps-icon">📍</span>
+        <span id="gps-label">Use my current location</span>
+      </button>
+      <div class="gps-divider">or search by city</div>
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
         <input id="city-search" type="text" placeholder="Search city..." autocomplete="off" />
@@ -225,6 +235,144 @@
             </thead>
             <tbody id="compare-tbody"></tbody>
           </table>
+        </div>
+      </div>
+
+
+      <!-- QIBLA COMPASS -->
+      <div class="qibla-section" id="qibla-section" style="display:none">
+        <div class="section-title">Qibla Direction</div>
+        <div class="qibla-card">
+          <div class="qibla-compass-wrap">
+            <div class="qibla-compass" id="qibla-compass">
+              <div class="compass-ring"></div>
+              <div class="compass-needle" id="compass-needle">
+                <div class="needle-north"></div>
+                <div class="needle-south"></div>
+              </div>
+              <div class="compass-kaaba" id="compass-kaaba">🕋</div>
+              <div class="compass-labels">
+                <span class="cl-n">N</span><span class="cl-e">E</span>
+                <span class="cl-s">S</span><span class="cl-w">W</span>
+              </div>
+            </div>
+          </div>
+          <div class="qibla-info">
+            <div class="qibla-deg-label">Direction to Mecca</div>
+            <div class="qibla-deg" id="qibla-deg">—°</div>
+            <div class="qibla-city-from" id="qibla-city-from">—</div>
+            <div class="qibla-note">Rotate your device until the needle points north, then face the Kaaba direction</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTEXTUAL DUAS -->
+      <div class="duas-section" id="duas-section">
+        <div class="section-title">Adhkar &amp; Duas <span class="duas-theme-badge" id="duas-theme-badge"></span></div>
+        <div class="duas-grid" id="duas-grid"></div>
+      </div>
+
+      <!-- PRAYER HABIT TRACKER -->
+      <div class="tracker-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="section-title">Prayer Habit Tracker</div>
+          <button class="tracker-reset-btn" id="tracker-reset-btn">Reset Week</button>
+        </div>
+        <div class="tracker-card">
+          <div class="tracker-grid" id="tracker-grid"></div>
+        </div>
+      </div>
+
+      <!-- ANNUAL PRAYER CHART -->
+      <div class="chart-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="section-title">Annual Prayer Times</div>
+          <div class="chart-controls">
+            <select id="chart-year-sel" class="cal-select"></select>
+            <button class="chart-load-btn" id="chart-load-btn">Load Chart</button>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-loading" id="chart-loading" style="display:none">
+            <div class="loader"></div><span>Loading year data…</span>
+          </div>
+          <canvas id="annual-chart" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#7eb8d4"></span>Fajr
+            <span class="legend-dot" style="background:#f6c958"></span>Sunrise
+            <span class="legend-dot" style="background:#e8856a"></span>Maghrib
+            <span class="legend-dot" style="background:#9b8fcf"></span>Isha
+          </div>
+        </div>
+      </div>
+
+      <!-- HIJRI <-> GREGORIAN CONVERTER -->
+      <div class="converter-section">
+        <div class="section-title">Date Converter</div>
+        <div class="converter-card">
+          <div class="converter-tabs">
+            <button class="conv-tab active" data-dir="toHijri">Gregorian → Hijri</button>
+            <button class="conv-tab" data-dir="toGreg">Hijri → Gregorian</button>
+          </div>
+          <div class="converter-body">
+            <div class="conv-inputs" id="conv-inputs-toHijri">
+              <input class="conv-input" id="conv-greg-day"   type="number" placeholder="Day"   min="1" max="31" />
+              <select class="conv-input" id="conv-greg-month">
+                <option value="">Month</option>
+                <option value="1">January</option><option value="2">February</option>
+                <option value="3">March</option><option value="4">April</option>
+                <option value="5">May</option><option value="6">June</option>
+                <option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option><option value="10">October</option>
+                <option value="11">November</option><option value="12">December</option>
+              </select>
+              <input class="conv-input" id="conv-greg-year"  type="number" placeholder="Year" min="1900" max="2100" />
+            </div>
+            <div class="conv-inputs" id="conv-inputs-toGreg" style="display:none">
+              <input class="conv-input" id="conv-hij-day"   type="number" placeholder="Day"   min="1" max="30" />
+              <select class="conv-input" id="conv-hij-month">
+                <option value="">Month</option>
+                <option value="1">Muharram</option><option value="2">Safar</option>
+                <option value="3">Rabi al-Awwal</option><option value="4">Rabi al-Thani</option>
+                <option value="5">Jumada al-Awwal</option><option value="6">Jumada al-Thani</option>
+                <option value="7">Rajab</option><option value="8">Sha'ban</option>
+                <option value="9">Ramadan</option><option value="10">Shawwal</option>
+                <option value="11">Dhul Qa'dah</option><option value="12">Dhul Hijjah</option>
+              </select>
+              <input class="conv-input" id="conv-hij-year"  type="number" placeholder="Year" min="1300" max="1600" />
+            </div>
+            <button class="conv-btn" id="conv-btn">Convert</button>
+            <div class="conv-result" id="conv-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAMADAN CALENDAR -->
+      <div class="ramcal-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="section-title">Ramadan Calendar</div>
+          <div class="cal-controls">
+            <select id="ramcal-year-sel" class="cal-select"></select>
+            <button class="cal-load-btn" id="ramcal-load-btn">Load Calendar</button>
+          </div>
+        </div>
+        <div id="ramcal-container">
+          <div class="cal-empty">Select a Hijri year to load the Ramadan calendar for that year.</div>
+        </div>
+      </div>
+
+      <!-- ISLAMIC MONTHLY CALENDAR -->
+      <div class="islamcal-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="section-title">Islamic Monthly Calendar</div>
+          <div class="cal-controls">
+            <select id="islamcal-month-sel" class="cal-select"></select>
+            <select id="islamcal-year-sel"  class="cal-select"></select>
+            <button class="cal-load-btn"    id="islamcal-load-btn">Load Month</button>
+          </div>
+        </div>
+        <div id="islamcal-container">
+          <div class="cal-empty">Select a month and year to view the Islamic calendar with daily prayer times.</div>
         </div>
       </div>
 
