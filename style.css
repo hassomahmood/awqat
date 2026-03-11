@@ -2909,3 +2909,37 @@ body.city-open .bismillah-bar {
   margin-bottom: 6px;
   line-height: 1;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PWA — STANDALONE MODE REFINEMENTS
+   Applied automatically when app is installed & launched standalone
+═══════════════════════════════════════════════════════════════ */
+
+/* Safe-area insets for notched / Dynamic Island iPhones */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .bismillah-bar {
+    padding-top: max(9px, env(safe-area-inset-top));
+  }
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .toast-container {
+    bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+  }
+}
+
+/* When running as installed PWA (no browser chrome) */
+@media (display-mode: standalone) {
+  /* Slightly more breathing room at the top */
+  .bismillah-bar {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  /* Hide the URL bar jump artifacts */
+  html {
+    height: -webkit-fill-available;
+  }
+  body {
+    min-height: -webkit-fill-available;
+  }
+}
+

@@ -1,3 +1,28 @@
+// ── Service Worker Registration ──────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg) {
+        console.log('[Awqat SW] Registered, scope:', reg.scope);
+        // Check for waiting SW update and notify
+        reg.addEventListener('updatefound', function() {
+          var newWorker = reg.installing;
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New version available — show a subtle toast
+              if (typeof showToast === 'function') {
+                showToast('App updated — refresh for latest version ✨', 6000);
+              }
+            }
+          });
+        });
+      })
+      .catch(function(err) {
+        console.warn('[Awqat SW] Registration failed:', err);
+      });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
 // ── Config ───────────────────────────────────────────────────────────────────
@@ -351,6 +376,18 @@ var THEME_COLORS = {
   maghrib:'#e06080', isha:'#50a0a8'
 };
 
+// PWA status-bar colours — match each theme's dominant background
+var THEME_BAR_COLORS = {
+  tahajjud: '#05081a',
+  fajr:     '#1a0d2e',
+  sunrise:  '#1c0e02',
+  morning:  '#fdf6e4',
+  dhuhr:    '#fdf4d8',
+  asr:      '#1c0e02',
+  maghrib:  '#140008',
+  isha:     '#020d12'
+};
+
 function getTheme(src, nowMins) {
   if (!src) return 'morning';
   var fajrM    = toMins(src.fajr);
@@ -391,6 +428,10 @@ function applyTheme(theme) {
     if (ic) ic.textContent = meta.icon;
     if (lb) lb.textContent = meta.label;
   }
+  // Update PWA status-bar / browser chrome colour to match active theme
+  var barColor = THEME_BAR_COLORS[theme] || '#0f1410';
+  var metaTheme = document.getElementById('meta-theme-color');
+  if (metaTheme) metaTheme.setAttribute('content', barColor);
 }
 
 // ── Progress bar ──────────────────────────────────────────────────────────────

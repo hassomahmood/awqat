@@ -1,0 +1,42 @@
+{
+  "name": "Awqat al-Salat — Prayer Times",
+  "short_name": "Awqat",
+  "description": "Hanafi & Jafari prayer times for any city, with Qibla, Duas, and Ramadan calendar",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "en",
+
+  "background_color": "#0f1410",
+  "theme_color": "#0f1410",
+
+  "categories": ["lifestyle", "utilities"],
+
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Prayer Times",
+      "short_name": "Times",
+      "description": "View today's prayer times",
+      "url": "/",
+      "icons": [{ "src": "icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+
+  "screenshots": []
+}
