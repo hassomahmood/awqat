@@ -34,7 +34,7 @@
       "short_name": "Times",
       "description": "View today's prayer times",
       "url": "/",
-      "icons": [{ "src": "icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icons/icon-192x192.png", "sizes": "192x192" }, { "src": "icons/icon-512x512.png", "sizes": "512x512" }]
     }
   ],
 
