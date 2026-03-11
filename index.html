@@ -5,41 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Awqat — Prayer Times</title>
 <link rel="icon" href="icons/icon-192x192.png" />
+
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
 
+<!-- Bootstrap 5.3 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+<!-- App styles (after Bootstrap so our rules override) -->
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ═══════════════════════════ CITY OVERLAY ═══════════════════════════ -->
+<!-- ══════════ CITY PICKER OVERLAY ══════════ -->
 <div id="city-overlay">
   <div class="city-picker-card">
     <div class="city-picker-header">
       <span class="mosque-icon">🕌</span>
       <h1>Awqat al-Salat</h1>
-      <p>أوقات الصلاة  ·  PRAYER TIMES</p>
+      <p>أوقات الصلاة &nbsp;·&nbsp; PRAYER TIMES</p>
     </div>
     <div class="city-picker-body">
+      <button class="gps-btn" id="gps-btn">
+        <i class="bi bi-geo-alt-fill me-2"></i>
+        <span id="gps-label">Use my current location</span>
+      </button>
+      <div class="gps-divider">or search by city</div>
       <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input id="city-search" type="text" placeholder="Search city..." autocomplete="off" />
+        <i class="bi bi-search search-icon-i"></i>
+        <input id="city-search" type="text" placeholder="Search city…" autocomplete="off" />
       </div>
       <div class="city-list" id="city-list"></div>
       <div class="manual-city-row">
-        <input id="manual-city" type="text" placeholder="Or type any city name..." />
-        <input id="manual-country" type="text" placeholder="Country (PK)" maxlength="3" style="width:110px;flex:none;" />
-        <button id="manual-go">Go →</button>
+        <input id="manual-city"    type="text" placeholder="Or type any city name…" />
+        <input id="manual-country" type="text" placeholder="CC" maxlength="3" class="manual-cc-input" />
+        <button id="manual-go">Go <i class="bi bi-arrow-right"></i></button>
       </div>
-      <p class="manual-hint">Enter city name + 2-letter country code (e.g. London / GB)</p>
+      <p class="manual-hint">City name + 2-letter country code · e.g. London / GB</p>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════ MAIN APP ═══════════════════════════ -->
+<!-- ══════════ MAIN APP ══════════ -->
 <div class="app">
-  <div class="main-wrap" id="main-wrap">
+  <div class="main-wrap container-xl" id="main-wrap">
 
     <!-- TOP BAR -->
     <div class="top-bar">
@@ -47,30 +59,66 @@
         <span class="mosque-icon">🕌</span>
         Awqat <span>al-Salat</span>
       </div>
-      <div id="theme-indicator" class="theme-indicator" style="display:none">
-        <span id="theme-icon">🌙</span>
-        <span id="theme-label">—</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+
+      <div class="top-bar-right">
+        <div id="theme-indicator" class="theme-indicator" style="display:none">
+          <span id="theme-icon">🌙</span>
+          <span id="theme-label">—</span>
+        </div>
+
         <button class="notif-btn" id="notif-btn" title="Enable prayer notifications">
           <span id="notif-icon">🔔</span>
           <span id="notif-label">Notify</span>
         </button>
-        <button class="change-city-btn" id="change-city-btn">
-          <span class="pin">📍</span>
-          <span id="current-city-label">—</span>
-          <span>↓</span>
-        </button>
-      </div>
-    </div>
 
-    <!-- LOADING STATE -->
+        <!-- Tools dropdown -->
+        <div class="dropdown">
+          <button class="tools-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-grid-3x3-gap-fill me-1"></i>
+            <span class="d-none d-sm-inline">Tools</span>
+            <i class="bi bi-chevron-down ms-1 small"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end awqat-dropdown">
+            <li>
+              <button class="dropdown-item awqat-menu-item" id="change-city-btn">
+                <i class="bi bi-geo-alt me-2"></i>Change City
+                <span id="current-city-label" class="city-badge ms-auto">—</span>
+              </button>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><h6 class="dropdown-header">📅 Calendars &amp; Tools</h6></li>
+            <li>
+              <button class="dropdown-item awqat-menu-item" data-bs-toggle="modal" data-bs-target="#modal-chart">
+                <i class="bi bi-bar-chart-line me-2"></i>Annual Prayer Chart
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item awqat-menu-item" data-bs-toggle="modal" data-bs-target="#modal-converter">
+                <i class="bi bi-calendar-event me-2"></i>Date Converter
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item awqat-menu-item" data-bs-toggle="modal" data-bs-target="#modal-ramcal">
+                <i class="bi bi-moon-stars me-2"></i>Ramadan Calendar
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item awqat-menu-item" data-bs-toggle="modal" data-bs-target="#modal-islamcal">
+                <i class="bi bi-calendar-month me-2"></i>Islamic Monthly Calendar
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /top-bar -->
+
+    <!-- LOADING -->
     <div id="loading-state" class="loading-wrap">
       <div class="loader"></div>
       <div class="loading-text">Loading prayer times…</div>
     </div>
 
-    <!-- ERROR STATE -->
+    <!-- ERROR -->
     <div id="error-state" class="error-card" style="display:none">
       <div class="error-icon">🌙</div>
       <div class="error-title">Could not load prayer times</div>
@@ -166,7 +214,7 @@
         </div>
       </div>
 
-      <!-- TAHAJJUD WIDGET -->
+      <!-- TAHAJJUD -->
       <div class="tahajjud-card" id="tahajjud-card">
         <div class="tahajjud-left">
           <div class="tahajjud-icon">☪</div>
@@ -197,9 +245,9 @@
         <div class="tahajjud-now-badge" id="tahajjud-now-badge">NOW</div>
       </div>
 
-      <!-- PRAYER CARDS (Fiqh tabbed) -->
+      <!-- PRAYER CARDS -->
       <div class="fiqh-section">
-        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
           <div class="section-title">Prayer Times</div>
           <div class="fiqh-tabs">
             <button class="fiqh-tab active hanafi" data-fiqh="hanafi">Hanafi</button>
@@ -228,6 +276,77 @@
         </div>
       </div>
 
+      <!-- QIBLA -->
+      <div class="qibla-section" id="qibla-section" style="display:none">
+        <div class="section-title">Qibla Direction</div>
+        <div class="qibla-card">
+          <div class="qibla-compass-wrap">
+            <div class="qibla-compass" id="qibla-compass">
+              <div class="compass-ring"></div>
+              <div class="compass-needle" id="compass-needle">
+                <div class="needle-north"></div>
+                <div class="needle-south"></div>
+              </div>
+              <div class="compass-kaaba" id="compass-kaaba">🕋</div>
+              <div class="compass-labels">
+                <span class="cl-n">N</span><span class="cl-e">E</span>
+                <span class="cl-s">S</span><span class="cl-w">W</span>
+              </div>
+            </div>
+          </div>
+          <div class="qibla-info">
+            <div class="qibla-deg-label">Direction to Mecca</div>
+            <div class="qibla-deg" id="qibla-deg">—°</div>
+            <div class="qibla-city-from" id="qibla-city-from">—</div>
+            <div class="qibla-note">Rotate your device until the needle points north, then face the Kaaba direction</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DUAS -->
+      <div class="duas-section" id="duas-section">
+        <div class="section-title">Adhkar &amp; Duas <span class="duas-theme-badge" id="duas-theme-badge"></span></div>
+        <div class="duas-grid" id="duas-grid"></div>
+      </div>
+
+      <!-- TRACKER -->
+      <div class="tracker-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div class="section-title">Prayer Habit Tracker</div>
+          <button class="tracker-reset-btn" id="tracker-reset-btn">Reset Week</button>
+        </div>
+        <div class="tracker-card">
+          <div class="tracker-grid" id="tracker-grid"></div>
+        </div>
+      </div>
+
+      <!-- TOOLS SHORTCUT CARDS -->
+      <div class="tools-shortcut-section">
+        <div class="section-title">Tools &amp; Calendars</div>
+        <div class="tools-shortcut-grid">
+          <button class="tool-shortcut-card" data-bs-toggle="modal" data-bs-target="#modal-chart">
+            <span class="tool-sc-icon">📊</span>
+            <span class="tool-sc-label">Annual Prayer Chart</span>
+            <span class="tool-sc-sub">View yearly prayer time trends</span>
+          </button>
+          <button class="tool-shortcut-card" data-bs-toggle="modal" data-bs-target="#modal-converter">
+            <span class="tool-sc-icon">🗓️</span>
+            <span class="tool-sc-label">Date Converter</span>
+            <span class="tool-sc-sub">Hijri ↔ Gregorian conversion</span>
+          </button>
+          <button class="tool-shortcut-card" data-bs-toggle="modal" data-bs-target="#modal-ramcal">
+            <span class="tool-sc-icon">🌙</span>
+            <span class="tool-sc-label">Ramadan Calendar</span>
+            <span class="tool-sc-sub">Sehr &amp; Iftar times for Ramadan</span>
+          </button>
+          <button class="tool-shortcut-card" data-bs-toggle="modal" data-bs-target="#modal-islamcal">
+            <span class="tool-sc-icon">📅</span>
+            <span class="tool-sc-label">Islamic Calendar</span>
+            <span class="tool-sc-sub">Full Islamic monthly calendar</span>
+          </button>
+        </div>
+      </div>
+
     </div><!-- /data-content -->
 
     <div class="footer">
@@ -239,9 +358,167 @@
     </div>
 
   </div><!-- /main-wrap -->
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: Annual Prayer Chart
+══════════════════════════════════════════════════════════ -->
+<div class="modal fade awqat-modal" id="modal-chart" tabindex="-1" aria-labelledby="lbl-chart" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header awqat-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-title-icon">📊</span>
+          <h5 class="modal-title" id="lbl-chart">Annual Prayer Times</h5>
+        </div>
+        <button type="button" class="awqat-modal-close" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body awqat-modal-body">
+        <div class="modal-controls-row">
+          <select id="chart-year-sel" class="cal-select"></select>
+          <button class="chart-load-btn" id="chart-load-btn">
+            <i class="bi bi-play-fill me-1"></i>Load Chart
+          </button>
+        </div>
+        <div class="chart-card">
+          <div class="chart-loading" id="chart-loading" style="display:none">
+            <div class="loader"></div><span>Loading year data…</span>
+          </div>
+          <canvas id="annual-chart" height="280"></canvas>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:#7eb8d4"></span>Fajr</span>
+            <span><span class="legend-dot" style="background:#f6c958"></span>Sunrise</span>
+            <span><span class="legend-dot" style="background:#e8856a"></span>Maghrib</span>
+            <span><span class="legend-dot" style="background:#9b8fcf"></span>Isha</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<script src="app.js"></script>
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: Date Converter
+══════════════════════════════════════════════════════════ -->
+<div class="modal fade awqat-modal" id="modal-converter" tabindex="-1" aria-labelledby="lbl-conv" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header awqat-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-title-icon">🗓️</span>
+          <h5 class="modal-title" id="lbl-conv">Hijri ↔ Gregorian Converter</h5>
+        </div>
+        <button type="button" class="awqat-modal-close" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body awqat-modal-body">
+        <div class="converter-tabs">
+          <button class="conv-tab active" data-dir="toHijri">Gregorian → Hijri</button>
+          <button class="conv-tab"        data-dir="toGreg">Hijri → Gregorian</button>
+        </div>
+        <div class="converter-body">
+          <div class="conv-inputs" id="conv-inputs-toHijri">
+            <input class="conv-input" id="conv-greg-day"   type="number" placeholder="Day"   min="1" max="31" />
+            <select class="conv-input" id="conv-greg-month">
+              <option value="">Month</option>
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="11">November</option><option value="12">December</option>
+            </select>
+            <input class="conv-input" id="conv-greg-year"  type="number" placeholder="Year" min="1900" max="2100" />
+          </div>
+          <div class="conv-inputs" id="conv-inputs-toGreg" style="display:none">
+            <input class="conv-input" id="conv-hij-day"   type="number" placeholder="Day"   min="1" max="30" />
+            <select class="conv-input" id="conv-hij-month">
+              <option value="">Month</option>
+              <option value="1">Muharram</option><option value="2">Safar</option>
+              <option value="3">Rabi al-Awwal</option><option value="4">Rabi al-Thani</option>
+              <option value="5">Jumada al-Awwal</option><option value="6">Jumada al-Thani</option>
+              <option value="7">Rajab</option><option value="8">Sha'ban</option>
+              <option value="9">Ramadan</option><option value="10">Shawwal</option>
+              <option value="11">Dhul Qa'dah</option><option value="12">Dhul Hijjah</option>
+            </select>
+            <input class="conv-input" id="conv-hij-year"  type="number" placeholder="Year" min="1300" max="1600" />
+          </div>
+          <button class="conv-btn" id="conv-btn">Convert</button>
+          <div class="conv-result" id="conv-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: Ramadan Calendar
+══════════════════════════════════════════════════════════ -->
+<div class="modal fade awqat-modal" id="modal-ramcal" tabindex="-1" aria-labelledby="lbl-ramcal" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header awqat-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-title-icon">🌙</span>
+          <h5 class="modal-title" id="lbl-ramcal">Ramadan Calendar</h5>
+        </div>
+        <button type="button" class="awqat-modal-close" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body awqat-modal-body">
+        <div class="modal-controls-row">
+          <select id="ramcal-year-sel" class="cal-select"></select>
+          <button class="cal-load-btn" id="ramcal-load-btn">
+            <i class="bi bi-play-fill me-1"></i>Load Calendar
+          </button>
+        </div>
+        <div id="ramcal-container">
+          <div class="cal-empty">Select a Hijri year to load the Ramadan calendar for that year.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: Islamic Monthly Calendar
+══════════════════════════════════════════════════════════ -->
+<div class="modal fade awqat-modal" id="modal-islamcal" tabindex="-1" aria-labelledby="lbl-islamcal" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header awqat-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-title-icon">📅</span>
+          <h5 class="modal-title" id="lbl-islamcal">Islamic Monthly Calendar</h5>
+        </div>
+        <button type="button" class="awqat-modal-close" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body awqat-modal-body">
+        <div class="modal-controls-row">
+          <select id="islamcal-month-sel" class="cal-select"></select>
+          <select id="islamcal-year-sel"  class="cal-select"></select>
+          <button class="cal-load-btn"    id="islamcal-load-btn">
+            <i class="bi bi-play-fill me-1"></i>Load Month
+          </button>
+        </div>
+        <div id="islamcal-container">
+          <div class="cal-empty">Select a month and year to view the Islamic calendar with daily prayer times.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

@@ -70,52 +70,95 @@ body::before {
 /* ═══════════════════════════════════════════════════════════════
    CITY PICKER OVERLAY
 ═══════════════════════════════════════════════════════════════ */
+/* City overlay — dark backdrop with centered login-style card */
 #city-overlay {
-  position: fixed; inset: 0; z-index: 1000;
-  background: var(--surface);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-  transition: opacity 0.5s, transform 0.5s;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  /* Above absolutely everything including bismillah bar */
+  z-index: 9000;
+  /* Rich dark backdrop — fully opaque, no bleed-through */
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 15%, rgba(184,134,11,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 70% at 85% 90%, rgba(45,106,94,0.26)  0%, transparent 55%),
+    #0c1209;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  /* No scroll on the backdrop itself */
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
 }
 #city-overlay.hidden {
-  opacity: 0; pointer-events: none; transform: scale(0.97);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .city-picker-card {
   background: white;
-  border-radius: var(--r2);
-  box-shadow: 0 24px 80px rgba(15,20,16,0.18);
-  width: 100%; max-width: 560px;
-  overflow: hidden;
-  animation: slideUp 0.6s cubic-bezier(0.16,1,0.3,1);
+  border-radius: 28px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 8px 40px rgba(0,0,0,0.55),
+    0 40px 100px rgba(0,0,0,0.40);
+  width: 100%;
+  max-width: 460px;
+  /* Cap height so card stays centered and scrolls internally */
+  max-height: 88dvh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  animation: cityCardIn 0.5s cubic-bezier(0.16,1,0.3,1);
 }
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes cityCardIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
-
 .city-picker-header {
-  background: var(--ink);
-  padding: 36px 36px 28px;
+  background: linear-gradient(155deg, #0f1410 0%, #1e2a20 60%, #0f1410 100%);
+  padding: 40px 36px 30px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.city-picker-header::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(184,134,11,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.city-picker-header::after {
+  content: '';
+  position: absolute; bottom: -30px; left: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(45,106,94,0.22) 0%, transparent 70%);
+  pointer-events: none;
 }
 .city-picker-header .mosque-icon {
-  font-size: 40px; margin-bottom: 12px; display: block;
+  font-size: 44px; margin-bottom: 14px; display: block;
   animation: sway 3s ease-in-out infinite;
+  position: relative; z-index: 1;
 }
 @keyframes sway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
 
 .city-picker-header h1 {
   font-family: var(--ff-display);
-  font-size: 38px; font-weight: 400;
+  font-size: 40px; font-weight: 400;
   color: var(--gold-lt);
   letter-spacing: 0.02em;
   line-height: 1;
+  position: relative; z-index: 1;
 }
 .city-picker-header p {
-  color: rgba(245,240,232,0.5);
-  font-size: 13px; margin-top: 6px;
-  font-weight: 300; letter-spacing: 0.06em;
+  color: rgba(245,240,232,0.45);
+  font-size: 12px; margin-top: 8px;
+  font-weight: 300; letter-spacing: 0.10em;
+  text-transform: uppercase;
+  position: relative; z-index: 1;
 }
 
 .city-picker-body { padding: 28px 32px 32px; }
@@ -147,6 +190,8 @@ body::before {
 
 .city-list {
   max-height: 280px; overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface);
@@ -214,8 +259,7 @@ body::before {
    MAIN APP LAYOUT
 ═══════════════════════════════════════════════════════════════ */
 .main-wrap {
-  max-width: 1100px; margin: 0 auto;
-  padding: 24px 20px 60px;
+  max-width: 1060px; margin: 0 auto;
   opacity: 0; transform: translateY(16px);
   transition: opacity 0.6s, transform 0.6s;
 }
@@ -225,15 +269,95 @@ body::before {
    TOP BAR
 ═══════════════════════════════════════════════════════════════ */
 .top-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(15,20,16,0.06);
+  transition: background 2s ease, border-color 2s ease, box-shadow 2s ease;
+}
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .brand {
   font-family: var(--ff-display);
-  font-size: 28px; font-weight: 400;
+  font-size: 26px; font-weight: 400;
   color: var(--ink); letter-spacing: 0.01em;
+  display: flex; align-items: center; gap: 8px;
 }
 .brand span { color: var(--gold); }
+/* Tools dropdown toggle */
+.tools-dropdown-btn {
+  display: flex; align-items: center;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-family: var(--ff-body); font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.tools-dropdown-btn:hover { background: var(--teal-lt); }
+.tools-dropdown-btn:focus { outline: none; }
+/* Custom dropdown menu */
+.awqat-dropdown {
+  min-width: 240px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 40px rgba(15,20,16,0.18) !important;
+  background: white !important;
+  padding: 8px 0 !important;
+  overflow: hidden;
+}
+.awqat-dropdown .dropdown-header {
+  font-family: var(--ff-body);
+  font-size: 11px; letter-spacing: 0.08em;
+  color: var(--text3); font-weight: 600;
+  text-transform: uppercase; padding: 8px 16px 6px;
+}
+.awqat-menu-item {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px !important;
+  font-family: var(--ff-body) !important;
+  font-size: 13px !important;
+  color: var(--text2) !important;
+  background: none !important;
+  border: none !important;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s !important;
+}
+.awqat-menu-item:hover {
+  background: var(--teal-pale) !important;
+  color: var(--teal) !important;
+}
+.awqat-menu-item .city-badge {
+  margin-left: auto;
+  background: var(--teal-pale);
+  color: var(--teal);
+  border-radius: 100px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+.dropdown-divider {
+  border-color: var(--border) !important;
+  margin: 4px 12px !important;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    THEME INDICATOR
@@ -272,31 +396,24 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
   .theme-indicator { padding: 5px 8px; }
 }
 
+/* change-city-btn lives inside awqat-dropdown now */
 .change-city-btn {
   display: flex; align-items: center; gap: 8px;
-  background: white;
-  border: 1.5px solid var(--border2);
-  border-radius: 100px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   font-family: var(--ff-body); font-size: 13px;
   color: var(--text2); cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: var(--shadow2);
+  background: none; border: none; width: 100%;
 }
-.change-city-btn:hover {
-  border-color: var(--teal); color: var(--teal);
-  box-shadow: 0 4px 16px rgba(45,106,94,0.15);
-}
-.change-city-btn .pin { font-size: 15px; }
+.change-city-btn:hover { background: var(--teal-pale); color: var(--teal); }
 
 /* ═══════════════════════════════════════════════════════════════
    HERO CARD
 ═══════════════════════════════════════════════════════════════ */
 .hero-card {
   background: var(--ink);
-  border-radius: var(--r2);
+  border-radius: 24px;
   padding: 36px 40px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   position: relative; overflow: hidden;
   box-shadow: var(--shadow);
 }
@@ -391,9 +508,9 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
    RAMADAN BANNER
 ═══════════════════════════════════════════════════════════════ */
 .ramadan-banner {
-  border-radius: var(--r2);
+  border-radius: 20px;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   box-shadow: var(--shadow);
   display: none;
 }
@@ -469,7 +586,7 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
 /* ═══════════════════════════════════════════════════════════════
    FIQH TABS
 ═══════════════════════════════════════════════════════════════ */
-.fiqh-section { margin-bottom: 20px; }
+.fiqh-section { margin-bottom: 24px; }
 
 .fiqh-tabs {
   display: flex; gap: 4px;
@@ -500,16 +617,16 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
 .prayers-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
+  gap: 14px;
 }
 
 .prayer-card {
   background: white;
-  border-radius: var(--r);
-  padding: 20px 16px;
+  border-radius: 16px;
+  padding: 22px 16px 18px;
   text-align: center;
   position: relative;
-  box-shadow: var(--shadow2);
+  box-shadow: 0 2px 10px rgba(15,20,16,0.06), 0 0 0 1px var(--border);
   border: 2px solid transparent;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.3s;
   cursor: default;
@@ -570,13 +687,22 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
 /* ═══════════════════════════════════════════════════════════════
    COMPARISON TABLE
 ═══════════════════════════════════════════════════════════════ */
-.compare-section { margin-bottom: 20px; }
+.compare-section { margin-bottom: 28px; }
 
 .section-title {
   font-family: var(--ff-display);
   font-size: 22px; font-weight: 400;
   color: var(--text); margin-bottom: 14px;
   letter-spacing: 0.01em;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 22px;
+  background: var(--gold);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .compare-table {
@@ -857,7 +983,7 @@ body[data-theme="isha"]     .theme-indicator { background: rgba(40,160,160,0.12)
   background: linear-gradient(135deg, #080c20 0%, #0e1440 50%, #080c20 100%);
   border-radius: var(--r2);
   padding: 24px 32px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   display: none;
   align-items: center;
   gap: 24px;
@@ -1294,6 +1420,17 @@ body[data-theme="isha"]::after {
 ═══════════════════════════════════════════════════════════════ */
 
 /* ── Top bar & brand ─────────────────────────────────────────── */
+body[data-theme] .top-bar {
+  background: rgba(0,0,0,0.25);
+  border-color: var(--t-border);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+}
+body[data-theme="morning"] .top-bar,
+body[data-theme="dhuhr"]   .top-bar {
+  background: rgba(255,255,255,0.72);
+  border-color: var(--t-border);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
 body[data-theme] .brand {
   color: var(--t-text);
 }
@@ -1390,6 +1527,9 @@ body[data-theme] #progress-pct {
 /* ── Section titles ──────────────────────────────────────────── */
 body[data-theme] .section-title {
   color: var(--t-text);
+}
+body[data-theme] .section-title::before {
+  background: var(--t-accent);
 }
 body[data-theme="morning"] .section-title { color: var(--t-text); }
 body[data-theme="dhuhr"]   .section-title { color: var(--t-text); }
@@ -1804,4 +1944,968 @@ body[data-theme="isha"]::after {
   body[data-theme]::after {
     animation: none !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BISMILLAH BAR
+   Fixed at very top of page, above everything. Uses Amiri font.
+═══════════════════════════════════════════════════════════════ */
+.bismillah-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  /* Below city-overlay (9000) but above everything else */
+  z-index: 2000;
+  text-align: center;
+  padding: 9px 20px 8px;
+  /* Single unified dark background — no jarring colour changes */
+  background: rgba(10, 14, 10, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(184,134,11,0.22);
+  pointer-events: none;
+  user-select: none;
+}
+.bismillah-text {
+  font-family: var(--ff-arabic);
+  font-size: 28px;
+  color: rgba(212,160,23,0.88);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+/* Push content below bismillah bar */
+body { padding-top: 50px; }
+/* City overlay starts from very top (covers bismillah too) */
+#city-overlay { top: 0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   GPS LOCATION BUTTON  (inside city picker)
+═══════════════════════════════════════════════════════════════ */
+.gps-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  gap: 9px;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: var(--r);
+  padding: 13px 18px;
+  font-family: var(--ff-body);
+  font-size: 14px; font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+  letter-spacing: 0.01em;
+}
+.gps-btn:hover  { background: var(--teal-lt); }
+.gps-btn:active { transform: scale(0.98); }
+.gps-btn.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+.gps-btn.loading .gps-icon {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+.gps-icon { font-size: 16px; line-height: 1; }
+
+/* Divider between GPS btn and search */
+.gps-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+  font-size: 11px; color: var(--text3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.gps-divider::before, .gps-divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QIBLA COMPASS
+═══════════════════════════════════════════════════════════════ */
+.qibla-section { margin-bottom: 28px; }
+.qibla-card {
+  background: white;
+  border-radius: var(--r2);
+  padding: 32px 40px;
+  display: flex; align-items: center; gap: 48px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.qibla-compass-wrap {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.qibla-compass {
+  position: relative;
+  width: 180px; height: 180px;
+}
+.compass-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  background: radial-gradient(circle, var(--surface2) 0%, var(--surface) 100%);
+}
+.compass-labels {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+.compass-labels span {
+  position: absolute;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+}
+.cl-n { top: 8px;  left: 50%; transform: translateX(-50%); }
+.cl-s { bottom: 8px; left: 50%; transform: translateX(-50%); }
+.cl-e { right: 10px; top: 50%; transform: translateY(-50%); }
+.cl-w { left: 10px;  top: 50%; transform: translateY(-50%); }
+
+.compass-needle {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 4px; height: 160px;
+  margin-left: -2px; margin-top: -80px;
+  transform-origin: 50% 50%;
+  transition: transform 1.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.needle-north {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, #e05050 0%, #c03030 100%);
+  border-radius: 2px 2px 0 0;
+}
+.needle-south {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 50%;
+  background: linear-gradient(0deg, #ccc 0%, #aaa 100%);
+  border-radius: 0 0 2px 2px;
+}
+.compass-kaaba {
+  position: absolute;
+  top: 50%; left: 50%;
+  font-size: 22px; line-height: 1;
+  margin-left: -11px; margin-top: -11px;
+  transform-origin: 11px 11px;
+  transition: transform 1.5s cubic-bezier(0.34,1.56,0.64,1);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  z-index: 2;
+}
+
+.qibla-info { flex: 1; min-width: 200px; }
+.qibla-deg-label {
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 6px;
+}
+.qibla-deg {
+  font-family: var(--ff-display);
+  font-size: 64px; font-weight: 300;
+  color: var(--gold); line-height: 1;
+  letter-spacing: -0.02em;
+}
+.qibla-city-from { font-size: 13px; color: var(--text3); margin-top: 4px; margin-bottom: 16px; }
+.qibla-note {
+  font-size: 12px; color: var(--text3); line-height: 1.6;
+  max-width: 280px;
+  border-left: 2px solid var(--border2);
+  padding-left: 12px;
+}
+
+/* theme overrides */
+body[data-theme] .qibla-card {
+  background: var(--t-surface);
+  border: 1px solid var(--t-border);
+  color: var(--t-text);
+}
+body[data-theme] .compass-ring {
+  border-color: var(--t-border);
+  background: radial-gradient(circle, var(--t-surface2) 0%, var(--t-surface) 100%);
+}
+body[data-theme] .qibla-deg { color: var(--t-accent); }
+body[data-theme] .qibla-deg-label,
+body[data-theme] .qibla-city-from,
+body[data-theme] .qibla-note { color: var(--t-text3); }
+
+@media (max-width: 600px) {
+  .qibla-card { flex-direction: column; padding: 24px 20px; gap: 28px; }
+  .qibla-deg { font-size: 48px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTEXTUAL DUAS
+═══════════════════════════════════════════════════════════════ */
+.duas-section { margin-bottom: 28px; }
+.duas-theme-badge {
+  display: inline-block;
+  font-family: var(--ff-body);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 3px 10px; border-radius: 100px;
+  margin-left: 10px; vertical-align: middle;
+}
+.duas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+.dua-card {
+  background: white;
+  border-radius: var(--r);
+  padding: 22px 24px;
+  box-shadow: var(--shadow2);
+  border: 1px solid var(--border);
+}
+.dua-occasion {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text3);
+  margin-bottom: 10px;
+}
+.dua-arabic {
+  font-family: var(--ff-arabic);
+  font-size: 20px; color: var(--text);
+  line-height: 1.8; direction: rtl; text-align: right;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.dua-english {
+  font-size: 13px; color: var(--text2); line-height: 1.6; font-style: italic;
+}
+
+/* theme overrides */
+body[data-theme] .dua-card {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+}
+body[data-theme] .dua-arabic { color: var(--t-text); border-bottom-color: var(--t-border); }
+body[data-theme] .dua-english { color: var(--t-text2); }
+body[data-theme] .dua-occasion { color: var(--t-text3); }
+
+/* ═══════════════════════════════════════════════════════════════
+   PRAYER HABIT TRACKER
+═══════════════════════════════════════════════════════════════ */
+.tracker-section { margin-bottom: 28px; }
+.tracker-reset-btn {
+  background: transparent;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 8px 16px;
+  font-family: var(--ff-body); font-size: 12px;
+  color: var(--text3); cursor: pointer;
+  transition: all 0.2s;
+}
+.tracker-reset-btn:hover { border-color: var(--rose); color: var(--rose); }
+
+.tracker-card {
+  background: white;
+  border-radius: var(--r2);
+  padding: 20px 24px;
+  box-shadow: var(--shadow2);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.tracker-grid { min-width: 480px; }
+.tracker-header {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  gap: 4px; margin-bottom: 6px;
+}
+.tracker-day-col {
+  text-align: center; padding: 6px 4px;
+}
+.tracker-day-col.today .tracker-day-name { color: var(--teal); font-weight: 700; }
+.tracker-day-col.today .tracker-day-date { color: var(--teal); }
+.tracker-day-name {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text3);
+}
+.tracker-day-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.tracker-row {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  gap: 4px; margin-bottom: 4px;
+}
+.tracker-prayer-col {
+  display: flex; align-items: center;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em; color: var(--text2);
+  padding: 4px 0;
+}
+.tracker-cell {
+  height: 38px; border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--surface);
+}
+.tracker-cell:hover:not(.future) { border-color: var(--teal); background: var(--teal-pale); }
+.tracker-cell.done {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: white;
+}
+.tracker-cell.future {
+  opacity: 0.3; cursor: default;
+  background: transparent;
+}
+
+/* theme overrides */
+body[data-theme] .tracker-card {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+}
+body[data-theme] .tracker-prayer-col,
+body[data-theme] .tracker-day-name  { color: var(--t-text2); }
+body[data-theme] .tracker-day-date  { color: var(--t-text3); }
+body[data-theme] .tracker-cell {
+  background: var(--t-surface2);
+  border-color: var(--t-border);
+}
+body[data-theme] .tracker-cell.done {
+  background: var(--t-accent); border-color: var(--t-accent); color: white;
+}
+
+@media (max-width: 600px) {
+  .tracker-card { padding: 14px 12px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANNUAL PRAYER CHART
+═══════════════════════════════════════════════════════════════ */
+.chart-section { margin-bottom: 28px; }
+.chart-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.chart-load-btn {
+  background: var(--teal); color: white; border: none;
+  border-radius: var(--r); padding: 10px 20px;
+  font-family: var(--ff-body); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background 0.2s;
+  white-space: nowrap;
+}
+.chart-load-btn:hover { background: var(--teal-lt); }
+.chart-card {
+  background: white;
+  border-radius: var(--r2);
+  padding: 24px;
+  box-shadow: var(--shadow2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.chart-loading {
+  display: flex; align-items: center; gap: 12px;
+  padding: 40px; justify-content: center;
+  color: var(--text3); font-size: 13px;
+}
+#annual-chart { width: 100%; display: block; }
+.chart-legend {
+  display: flex; gap: 20px; justify-content: center;
+  margin-top: 16px; flex-wrap: wrap;
+  font-size: 12px; color: var(--text3);
+}
+.legend-dot {
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* theme overrides */
+body[data-theme] .chart-card {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+}
+body[data-theme] .chart-legend { color: var(--t-text3); }
+
+@media (max-width: 600px) {
+  .chart-card { padding: 14px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DATE CONVERTER
+═══════════════════════════════════════════════════════════════ */
+.converter-section { margin-bottom: 28px; }
+.converter-card {
+  background: white;
+  border-radius: var(--r2);
+  box-shadow: var(--shadow2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.converter-tabs {
+  display: flex; background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.conv-tab {
+  flex: 1; padding: 14px 16px;
+  background: transparent; border: none;
+  font-family: var(--ff-body); font-size: 13px; font-weight: 500;
+  color: var(--text3); cursor: pointer;
+  transition: all 0.2s; letter-spacing: 0.02em;
+  border-bottom: 2px solid transparent;
+}
+.conv-tab.active {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+  background: white;
+}
+.conv-tab:hover:not(.active) { color: var(--text2); }
+.converter-body { padding: 24px 28px; }
+.conv-inputs {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.conv-input {
+  flex: 1; min-width: 80px;
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 11px 14px;
+  font-family: var(--ff-body); font-size: 14px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+  -moz-appearance: textfield;
+}
+.conv-input:focus { border-color: var(--teal); }
+select.conv-input { cursor: pointer; }
+.conv-btn {
+  background: var(--gold); color: white; border: none;
+  border-radius: var(--r); padding: 12px 28px;
+  font-family: var(--ff-body); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.2s;
+}
+.conv-btn:hover { background: var(--gold-lt); }
+.conv-result {
+  margin-top: 20px; padding: 20px 24px;
+  background: var(--surface);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  min-height: 60px;
+}
+.conv-result-main {
+  font-family: var(--ff-display);
+  font-size: 32px; font-weight: 400;
+  color: var(--text); letter-spacing: 0.02em; line-height: 1;
+  margin-bottom: 6px;
+}
+.conv-result-sub { font-size: 13px; color: var(--text3); }
+.conv-err { color: var(--rose); font-size: 13px; }
+
+/* theme overrides */
+body[data-theme] .converter-card { background: var(--t-surface); border-color: var(--t-border); }
+body[data-theme] .converter-tabs { background: var(--t-surface2); border-bottom-color: var(--t-border); }
+body[data-theme] .conv-tab { color: var(--t-text3); }
+body[data-theme] .conv-tab.active { color: var(--t-accent); border-bottom-color: var(--t-accent); background: var(--t-surface); }
+body[data-theme] .conv-input { background: var(--t-surface2); border-color: var(--t-border); color: var(--t-text); }
+body[data-theme] .conv-result { background: var(--t-surface2); border-color: var(--t-border); }
+body[data-theme] .conv-result-main { color: var(--t-text); }
+body[data-theme] .conv-result-sub { color: var(--t-text3); }
+
+@media (max-width: 600px) {
+  .converter-body { padding: 16px; }
+  .conv-result-main { font-size: 24px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CALENDAR SHARED STYLES
+═══════════════════════════════════════════════════════════════ */
+.ramcal-section, .islamcal-section { margin-bottom: 28px; }
+.cal-select {
+  background: white;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 9px 14px;
+  font-family: var(--ff-body); font-size: 13px; color: var(--text);
+  outline: none; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.cal-select:focus { border-color: var(--teal); }
+.cal-load-btn {
+  background: var(--teal); color: white; border: none;
+  border-radius: var(--r); padding: 10px 20px;
+  font-family: var(--ff-body); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background 0.2s;
+  white-space: nowrap;
+}
+.cal-load-btn:hover { background: var(--teal-lt); }
+.cal-empty {
+  background: white;
+  border-radius: var(--r2); padding: 40px;
+  text-align: center; color: var(--text3);
+  font-size: 14px; line-height: 1.7;
+  border: 1px solid var(--border);
+}
+.cal-loading {
+  display: flex; align-items: center; gap: 12px;
+  padding: 40px; justify-content: center;
+  color: var(--text3); font-size: 13px;
+  background: white; border-radius: var(--r2);
+  border: 1px solid var(--border);
+}
+.cal-note {
+  font-size: 11px; color: var(--text3);
+  margin-top: 10px; padding: 0 4px;
+  font-style: italic;
+}
+.cal-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Ramadan calendar table */
+.ramcal-table-wrap, .islamcal-table-wrap {
+  background: white;
+  border-radius: var(--r2); overflow: hidden;
+  box-shadow: var(--shadow2);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.ramcal-table, .islamcal-table {
+  width: 100%; border-collapse: collapse;
+  min-width: 560px;
+}
+.ramcal-table thead tr,
+.islamcal-table thead tr { background: var(--ink); }
+.ramcal-table thead th,
+.islamcal-table thead th {
+  padding: 12px 16px;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: rgba(245,240,232,0.55); text-align: left;
+}
+.ramcal-table thead th.sehr-col  { color: #7eb8d4; }
+.ramcal-table thead th.iftar-col { color: #e8856a; }
+.ramcal-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.ramcal-table tbody tr:last-child,
+.islamcal-table tbody tr:last-child { border-bottom: none; }
+.ramcal-table tbody tr:hover,
+.islamcal-table tbody tr:hover { background: var(--surface); }
+.islamcal-table tbody tr.today-row { background: var(--teal-pale); }
+.ramcal-table tbody td,
+.islamcal-table tbody td {
+  padding: 11px 16px;
+  font-size: 13px; color: var(--text);
+}
+.day-num { font-weight: 600; color: var(--text2); width: 50px; }
+.greg-date { color: var(--text3); font-size: 12px; }
+.dow { color: var(--text3); font-size: 12px; }
+.hij-date { font-family: var(--ff-arabic); font-size: 15px; color: var(--text2); }
+.sehr-cell  { color: #3a8aae; font-family: var(--ff-display); font-size: 17px; font-weight: 400; }
+.iftar-cell { color: #c05040; font-family: var(--ff-display); font-size: 17px; font-weight: 400; }
+.t-muted { color: var(--text3); font-size: 11px; font-style: italic; font-family: var(--ff-body); }
+.t12 { font-size: 10px; color: var(--text3); margin-top: 1px; font-family: var(--ff-body); font-size: 11px; }
+.cal-month-header {
+  font-family: var(--ff-display);
+  font-size: 22px; color: var(--text); margin-bottom: 14px;
+}
+
+/* theme overrides for calendars */
+body[data-theme] .cal-empty,
+body[data-theme] .cal-loading {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+  color: var(--t-text3);
+}
+body[data-theme] .cal-select {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+  color: var(--t-text);
+}
+body[data-theme] .ramcal-table-wrap,
+body[data-theme] .islamcal-table-wrap {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+}
+body[data-theme] .ramcal-table tbody td,
+body[data-theme] .islamcal-table tbody td { color: var(--t-text); }
+body[data-theme] .ramcal-table tbody tr:hover,
+body[data-theme] .islamcal-table tbody tr:hover { background: var(--t-surface2); }
+body[data-theme] .islamcal-table tbody tr.today-row { background: var(--t-active-row); }
+body[data-theme] .cal-month-header { color: var(--t-text); }
+body[data-theme] .tracker-reset-btn { border-color: var(--t-border); color: var(--t-text3); }
+
+/* Progress bar label fix (from previous session) */
+body[data-theme] .prayer-progress-labels,
+body[data-theme] #progress-from,
+body[data-theme] #progress-to {
+  color: rgba(255,255,255,0.35) !important;
+}
+body[data-theme] #progress-pct {
+  color: rgba(255,255,255,0.65) !important;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOTSTRAP INTEGRATION — Safe overrides
+═══════════════════════════════════════════════════════════════ */
+
+/* Keep our fonts dominant */
+body, button, input, select, textarea {
+  font-family: var(--ff-body) !important;
+}
+
+/* Scoped resets so Bootstrap doesn't bleed into our custom styles */
+.app *, .app *::before, .app *::after { box-sizing: border-box; }
+
+/* Container override — use our custom max-width */
+.main-wrap.container-xl {
+  max-width: 1060px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* ── City picker search icon ─────────────────────────────────── */
+.search-icon-i {
+  position: absolute;
+  left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text3); font-size: 15px; pointer-events: none;
+  z-index: 2;
+}
+.search-wrap { position: relative; }
+.search-wrap input { padding-left: 42px !important; }
+
+/* Manual city input CC field */
+.manual-cc-input {
+  width: 70px !important;
+  flex: none !important;
+  text-align: center;
+}
+
+/* ── AWQAT MODALS ─────────────────────────────────────────────── */
+.awqat-modal .modal-content {
+  font-family: var(--ff-body) !important;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px !important;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.28) !important;
+}
+.awqat-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 18px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-title-icon { font-size: 22px; line-height: 1; }
+.awqat-modal .modal-title {
+  font-family: var(--ff-display) !important;
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  color: var(--text) !important;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+.awqat-modal-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  color: var(--text2); font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.awqat-modal-close:hover {
+  background: var(--rose-pale);
+  color: var(--rose);
+  border-color: var(--rose);
+}
+.awqat-modal-body {
+  padding: 24px;
+  background: var(--surface);
+}
+.modal-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+/* Theme-aware modals */
+body[data-theme] .awqat-modal .modal-content { background: var(--t-surface); border-color: var(--t-border); }
+body[data-theme] .awqat-modal-header { background: var(--t-surface2); border-bottom-color: var(--t-border); }
+body[data-theme] .awqat-modal .modal-title { color: var(--t-text) !important; }
+body[data-theme] .awqat-modal-body { background: var(--t-surface); }
+body[data-theme] .awqat-modal-close { background: var(--t-surface2); border-color: var(--t-border); color: var(--t-text2); }
+body[data-theme="morning"] .awqat-modal .modal-content,
+body[data-theme="dhuhr"]   .awqat-modal .modal-content { background: white; }
+body[data-theme="morning"] .awqat-modal-header,
+body[data-theme="dhuhr"]   .awqat-modal-header { background: var(--surface2); }
+body[data-theme="morning"] .awqat-modal-body,
+body[data-theme="dhuhr"]   .awqat-modal-body { background: white; }
+
+/* ── TOOLS SHORTCUT CARDS GRID ───────────────────────────────── */
+.tools-shortcut-section {
+  margin-bottom: 28px;
+}
+.tools-shortcut-section .section-title {
+  margin-bottom: 16px;
+}
+.tools-shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 768px) {
+  .tools-shortcut-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+  .tools-shortcut-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+.tool-shortcut-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 18px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 2px 8px rgba(15,20,16,0.05);
+  width: 100%;
+}
+.tool-shortcut-card:hover {
+  border-color: var(--teal);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(45,106,94,0.14);
+}
+.tool-shortcut-card:active { transform: scale(0.98); }
+.tool-sc-icon { font-size: 28px; line-height: 1; }
+.tool-sc-label {
+  font-size: 13px; font-weight: 600;
+  color: var(--text); line-height: 1.3;
+}
+.tool-sc-sub {
+  font-size: 11px; color: var(--text3); line-height: 1.4;
+}
+body[data-theme] .tool-shortcut-card {
+  background: var(--t-surface);
+  border-color: var(--t-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+body[data-theme] .tool-shortcut-card:hover {
+  border-color: var(--t-accent);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.28);
+}
+body[data-theme] .tool-sc-label { color: var(--t-text); }
+body[data-theme] .tool-sc-sub { color: var(--t-text2); }
+body[data-theme="morning"] .tool-shortcut-card,
+body[data-theme="dhuhr"]   .tool-shortcut-card { background: white; }
+
+/* ── THEME OVERRIDES FOR DROPDOWN ────────────────────────────── */
+body[data-theme] .awqat-dropdown { background: var(--t-surface) !important; border-color: var(--t-border) !important; }
+body[data-theme] .awqat-menu-item { color: var(--t-text2) !important; }
+body[data-theme] .awqat-menu-item:hover { background: var(--t-surface2) !important; color: var(--t-accent) !important; }
+body[data-theme] .tools-dropdown-btn { background: var(--t-accent2, var(--teal)); }
+body[data-theme] .awqat-dropdown .dropdown-header { color: var(--t-text3, var(--text3)) !important; }
+body[data-theme="morning"] .awqat-dropdown,
+body[data-theme="dhuhr"]   .awqat-dropdown { background: white !important; }
+
+/* ── EXTRA MOBILE TWEAKS ─────────────────────────────────────── */
+@media (max-width: 576px) {
+  .top-bar { padding: 10px 14px; }
+  .brand { font-size: 21px; }
+  .tools-dropdown-btn { padding: 8px 12px; font-size: 12px; }
+  .main-wrap.container-xl { padding-left: 14px !important; padding-right: 14px !important; }
+}
+@media (max-width: 480px) {
+  .tool-shortcut-card { padding: 16px 14px; }
+  .tool-sc-icon { font-size: 24px; }
+}
+
+/* Chart legend flex */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DROPDOWN Z-INDEX FIX — appear above all cards
+═══════════════════════════════════════════════════════════════ */
+.dropdown { position: static !important; }
+.top-bar  { position: relative; z-index: 200; }
+.awqat-dropdown.dropdown-menu {
+  z-index: 9999 !important;
+  position: absolute !important;
+}
+/* Ensure hero card & other sections sit below the dropdown */
+.hero-card, .fiqh-section, .compare-section,
+.tahajjud-card, .ramadan-banner,
+.qibla-section, .duas-section, .tracker-section,
+.tools-shortcut-section {
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPLASH / AUTO-LOAD LOADER
+═══════════════════════════════════════════════════════════════ */
+.splash-loader-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 20px;
+  text-align: center;
+  animation: splashFadeIn 0.6s ease;
+}
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.splash-mosque-icon {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 4px;
+  animation: splashSway 3s ease-in-out infinite;
+}
+@keyframes splashSway {
+  0%,100% { transform: rotate(-3deg) scale(1); }
+  50%      { transform: rotate(3deg) scale(1.06); }
+}
+.splash-title {
+  font-family: var(--ff-display);
+  font-size: 36px; font-weight: 400;
+  color: var(--text); letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+body[data-theme] .splash-title { color: var(--t-text); }
+.splash-subtitle {
+  font-family: var(--ff-arabic);
+  font-size: 20px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.06em;
+}
+body[data-theme] .splash-subtitle { color: var(--t-accent); }
+
+/* Spinner ring */
+.splash-spinner-ring {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: conic-gradient(var(--teal) 0%, transparent 70%);
+  display: flex; align-items: center; justify-content: center;
+  animation: spinRing 1.1s linear infinite;
+  margin: 8px 0;
+}
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+.splash-spinner {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+body[data-theme] .splash-spinner { background: var(--t-surface); }
+
+/* City pill */
+.splash-city-line {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  padding: 8px 20px;
+  margin-top: 4px;
+}
+body[data-theme] .splash-city-line { background: var(--t-surface2); border-color: var(--t-border); }
+.splash-pin { font-size: 15px; }
+.splash-city-name {
+  font-size: 15px; font-weight: 600;
+  color: var(--text); letter-spacing: 0.02em;
+}
+body[data-theme] .splash-city-name { color: var(--t-text); }
+.splash-status {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  animation: splashPulse 1.6s ease-in-out infinite;
+}
+body[data-theme] .splash-status { color: var(--t-text3, var(--text3)); }
+@keyframes splashPulse {
+  0%,100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* Progress dots beneath status */
+.splash-dots {
+  display: flex; gap: 6px; justify-content: center;
+  margin-top: 2px;
+}
+.splash-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); opacity: 0.3;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.splash-dot:nth-child(2) { animation-delay: 0.2s; }
+.splash-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotBounce {
+  0%,100% { opacity: 0.3; transform: translateY(0); }
+  50%      { opacity: 1;   transform: translateY(-4px); }
+}
+
+/* Transition when data loads in */
+#data-content {
+  animation: dataFadeIn 0.5s ease;
+}
+@keyframes dataFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ── Hide scrollbars on city selector elements (webkit) ── */
+#city-overlay::-webkit-scrollbar,
+.city-picker-card::-webkit-scrollbar,
+.city-list::-webkit-scrollbar { display: none; width: 0; }
+
+/* bismillah sizing handled in main block above */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CITY OVERLAY — BODY SCROLL LOCK
+   Applied via JS when overlay is visible
+═══════════════════════════════════════════════════════════════ */
+body.city-open {
+  overflow: hidden;
+  /* Prevent layout shift when scrollbar disappears */
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+/* Bismillah bar sits INSIDE the overlay experience when open —
+   hide it so the overlay feels like a completely separate page */
+body.city-open .bismillah-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* City overlay own bismillah strip (inside the card header area) */
+.city-overlay-bismillah {
+  display: block;
+  text-align: center;
+  font-family: var(--ff-arabic);
+  font-size: 18px;
+  color: rgba(212,160,23,0.60);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  line-height: 1;
 }
