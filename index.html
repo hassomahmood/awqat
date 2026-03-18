@@ -29,6 +29,24 @@
 </head>
 <body>
 
+<!-- ══════════ BISMILLAH BAR ══════════ -->
+<div class="bismillah-bar">
+  <span class="bismillah-text">بِسْمِ ٱللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
+</div>
+
+<!-- ══════════ UPDATE BANNER ══════════ -->
+<div class="update-banner" id="update-banner" style="display:none">
+  <div class="update-banner-inner">
+    <span class="update-icon">✨</span>
+    <div class="update-text">
+      <strong>New version available</strong>
+      <span>Awqat has been updated with improvements</span>
+    </div>
+    <button class="update-btn" id="update-btn">Refresh now</button>
+    <button class="update-dismiss" id="update-dismiss" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
 <!-- ══════════ CITY PICKER OVERLAY ══════════ -->
 <div id="city-overlay">
   <div class="city-picker-card">
@@ -290,6 +308,7 @@
         <div class="section-title">Qibla Direction</div>
         <div class="qibla-card">
           <div class="qibla-compass-wrap">
+            <!-- Outer ring rotates with device heading to keep N pointing north -->
             <div class="qibla-compass" id="qibla-compass">
               <div class="compass-ring"></div>
               <div class="compass-needle" id="compass-needle">
@@ -302,12 +321,26 @@
                 <span class="cl-s">S</span><span class="cl-w">W</span>
               </div>
             </div>
+            <!-- Live sensor status badge -->
+            <div class="compass-status" id="compass-status">
+              <span class="compass-status-dot" id="compass-status-dot"></span>
+              <span id="compass-status-text">Tap to enable live compass</span>
+            </div>
           </div>
           <div class="qibla-info">
             <div class="qibla-deg-label">Direction to Mecca</div>
             <div class="qibla-deg" id="qibla-deg">—°</div>
             <div class="qibla-city-from" id="qibla-city-from">—</div>
-            <div class="qibla-note">Rotate your device until the needle points north, then face the Kaaba direction</div>
+            <div class="qibla-device-heading" id="qibla-device-heading" style="display:none">
+              Device heading: <span id="heading-val">—</span>°
+            </div>
+            <!-- Enable live compass button (needed for iOS 13+ permission) -->
+            <button class="compass-enable-btn" id="compass-enable-btn">
+              <i class="bi bi-compass me-2"></i>Enable Live Compass
+            </button>
+            <div class="qibla-note" id="qibla-note">
+              Hold your phone flat and tap Enable Live Compass. The 🕋 will point toward Mecca as you rotate.
+            </div>
           </div>
         </div>
       </div>

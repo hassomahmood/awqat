@@ -1,15 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════
-   Awqat al-Salat — Service Worker
-   Uses relative paths so it works on GitHub Pages (/awqat/),
-   Vercel (/), or any subdirectory deployment.
+   Awqat al-Salat — Service Worker v2
+   Bump CACHE_NAME version whenever you deploy significant updates
+   to force users to get fresh files.
 ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'awqat-v1';
-
-// Derive base path from sw.js location — works in any subdirectory
+const CACHE_NAME = 'awqat-v2';
 const BASE = self.registration.scope;
 
-// Core app shell assets to pre-cache
 const SHELL_ASSETS = [
   BASE,
   BASE + 'index.html',
@@ -20,45 +17,47 @@ const SHELL_ASSETS = [
   BASE + 'icons/icon-512x512.png',
 ];
 
-// Install: pre-cache the app shell
+// ── Install: pre-cache app shell ─────────────────────────────────────
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return Promise.allSettled(
-          SHELL_ASSETS.map(function(url) {
-            return fetch(url)
-              .then(function(res) { if (res.ok) return cache.put(url, res); })
-              .catch(function() {});
-          })
-        );
-      })
-      .then(function() { return self.skipWaiting(); })
+    caches.open(CACHE_NAME).then(function(cache) {
+      // Use allSettled so one 404 doesn't abort the whole install
+      return Promise.allSettled(
+        SHELL_ASSETS.map(function(url) {
+          return fetch(url).then(function(res) {
+            if (res.ok) return cache.put(url, res);
+          }).catch(function() {});
+        })
+      );
+    }).then(function() {
+      // Don't auto-activate — wait for app to call SKIP_WAITING
+      // so users see the update banner before reload
+    })
   );
 });
 
-// Activate: remove stale caches
+// ── Activate: clear old caches ───────────────────────────────────────
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys.filter(function(key) { return key !== CACHE_NAME; })
-            .map(function(key) { return caches.delete(key); })
+        keys.filter(function(k) { return k !== CACHE_NAME; })
+            .map(function(k) { return caches.delete(k); })
       );
     }).then(function() { return self.clients.claim(); })
   );
 });
 
-// Fetch: smart caching strategy
+// ── Fetch: smart strategy ────────────────────────────────────────────
 self.addEventListener('fetch', function(e) {
   var url = new URL(e.request.url);
 
-  // Always network-first for API calls
+  // 1. API calls — always network (live prayer data, never cache)
   if (url.pathname.includes('/api/')) {
     e.respondWith(
       fetch(e.request).catch(function() {
         return new Response(
-          JSON.stringify({ error: 'You are offline.' }),
+          JSON.stringify({ error: 'You are offline. Please check your connection.' }),
           { headers: { 'Content-Type': 'application/json' } }
         );
       })
@@ -66,7 +65,7 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  // CDN assets — cache first
+  // 2. CDN (fonts, Bootstrap) — cache first, network fallback
   if (url.hostname === 'fonts.googleapis.com' ||
       url.hostname === 'fonts.gstatic.com' ||
       url.hostname === 'cdn.jsdelivr.net') {
@@ -83,7 +82,7 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  // App shell — cache first, network fallback
+  // 3. App shell — cache first, network fallback + re-cache
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       if (cached) return cached;
@@ -102,7 +101,9 @@ self.addEventListener('fetch', function(e) {
   );
 });
 
-// Allow app to trigger SW update
+// ── Message: app triggers SW activation ─────────────────────────────
 self.addEventListener('message', function(e) {
-  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (e.data && e.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

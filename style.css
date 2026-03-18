@@ -2943,3 +2943,166 @@ body.city-open .bismillah-bar {
   }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   UPDATE BANNER
+═══════════════════════════════════════════════════════════════ */
+.update-banner {
+  position: fixed;
+  top: 50px; /* below bismillah bar */
+  left: 0; right: 0;
+  z-index: 8000;
+  padding: 0 16px;
+  transform: translateY(-110%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+.update-banner.visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.update-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--ink);
+  border: 1px solid rgba(184,134,11,0.35);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  max-width: 600px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+.update-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.update-text {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.update-text strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5e6b0;
+  font-family: var(--ff-body);
+}
+.update-text span {
+  font-size: 11px;
+  color: rgba(245,230,176,0.55);
+  font-family: var(--ff-body);
+}
+.update-btn {
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-family: var(--ff-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.update-btn:hover  { background: var(--gold-lt); }
+.update-btn:active { transform: scale(0.97); }
+.update-dismiss {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.45);
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.update-dismiss:hover {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIVE COMPASS ENHANCEMENTS
+═══════════════════════════════════════════════════════════════ */
+
+/* Smooth compass ring rotation */
+#qibla-compass {
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+#compass-needle {
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+#compass-kaaba {
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+
+/* Status badge below compass */
+.compass-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--ff-body);
+  letter-spacing: 0.04em;
+}
+.compass-status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+  transition: background 0.4s;
+}
+.compass-status-dot.active {
+  background: #4caf50;
+  box-shadow: 0 0 6px rgba(76,175,80,0.6);
+  animation: pulse-green 1.8s ease-in-out infinite;
+}
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 4px rgba(76,175,80,0.4); }
+  50%      { box-shadow: 0 0 12px rgba(76,175,80,0.8); }
+}
+
+/* Enable compass button */
+.compass-enable-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 14px;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 10px 20px;
+  font-family: var(--ff-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.compass-enable-btn:hover  { background: var(--teal-lt); }
+.compass-enable-btn:active { transform: scale(0.97); }
+body[data-theme] .compass-enable-btn { background: var(--t-accent2, var(--teal)); }
+
+/* Device heading display */
+.qibla-device-heading {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 6px;
+  font-family: var(--ff-body);
+  letter-spacing: 0.04em;
+}
+body[data-theme] .qibla-device-heading { color: var(--t-text3, var(--text3)); }
+

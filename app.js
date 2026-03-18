@@ -1,21 +1,60 @@
-// ── Service Worker Registration (relative path — works on any host/subdir) ──
+// ── Service Worker Registration + Update Prompt ──────────────────────────────
+var swRegistration = null;
+var newWorkerWaiting = null;
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('sw.js')
       .then(function(reg) {
+        swRegistration = reg;
         console.log('[Awqat SW] Registered:', reg.scope);
+
+        // Check if there is already a waiting SW (user revisiting after update)
+        if (reg.waiting) {
+          showUpdateBanner(reg.waiting);
+        }
+
+        // Listen for a new SW found during this session
         reg.addEventListener('updatefound', function() {
-          var nw = reg.installing;
-          nw.addEventListener('statechange', function() {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              if (typeof showToast === 'function') {
-                showToast('App updated — refresh for latest ✨', 6000);
-              }
+          var newWorker = reg.installing;
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New version ready — show the beautiful update banner
+              showUpdateBanner(newWorker);
             }
           });
         });
       })
       .catch(function(err) { console.warn('[Awqat SW] Failed:', err); });
+
+    // When SW activates after skip-waiting, reload the page cleanly
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      if (newWorkerWaiting) {
+        window.location.reload();
+      }
+    });
+  });
+}
+
+function showUpdateBanner(worker) {
+  newWorkerWaiting = worker;
+  var banner = document.getElementById('update-banner');
+  if (!banner) return;
+  // Slide the banner in
+  banner.style.display = 'block';
+  requestAnimationFrame(function() { banner.classList.add('visible'); });
+
+  // Refresh button — tell waiting SW to take over
+  document.getElementById('update-btn').addEventListener('click', function() {
+    if (newWorkerWaiting) {
+      newWorkerWaiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+  });
+
+  // Dismiss button — hide banner, user can update later
+  document.getElementById('update-dismiss').addEventListener('click', function() {
+    banner.classList.remove('visible');
+    setTimeout(function() { banner.style.display = 'none'; }, 400);
   });
 }
 
@@ -738,9 +777,13 @@ function checkAndNotify(data) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// QIBLA COMPASS
+// QIBLA COMPASS — with live DeviceOrientation sensor
 // ═══════════════════════════════════════════════════════════════
-var qiblaFetched = false;
+var qiblaFetched   = false;
+var qiblaBearing   = null;   // true bearing to Mecca from current location
+var compassActive  = false;  // whether device sensor is running
+var compassHandler = null;   // reference so we can remove listener
+
 function fetchQibla(lat, lng) {
   if (qiblaFetched) return;
   qiblaFetched = true;
@@ -749,33 +792,176 @@ function fetchQibla(lat, lng) {
     .then(function(data) {
       var deg = data.direction != null ? Math.round(data.direction) : null;
       if (deg === null) return;
+      qiblaBearing = deg;
+
       document.getElementById('qibla-section').style.display = 'block';
       document.getElementById('qibla-deg').textContent = deg + '°';
       document.getElementById('qibla-city-from').textContent = 'from ' + (currentCity || '');
-      // Rotate needle: needle points to Qibla bearing
-      document.getElementById('compass-needle').style.transform = 'rotate(' + deg + 'deg)';
-      document.getElementById('compass-kaaba').style.transform =
-        'rotate(' + deg + 'deg) translateY(-76px) rotate(-' + deg + 'deg)';
+
+      // Static position (no sensor yet) — needle points to bearing, kaaba sits at tip
+      setStaticCompass(deg);
+
+      // Try to start live compass automatically on Android (no permission needed)
+      if (window.DeviceOrientationEvent && !compassActive) {
+        startLiveCompass();
+      }
     })
     .catch(function() {});
 }
 
+// Static fallback: rotate whole compass so needle points to qibla
+function setStaticCompass(bearing) {
+  var needle = document.getElementById('compass-needle');
+  var kaaba  = document.getElementById('compass-kaaba');
+  if (needle) needle.style.transform = 'rotate(' + bearing + 'deg)';
+  if (kaaba)  kaaba.style.transform  =
+    'rotate(' + bearing + 'deg) translateY(-76px) rotate(-' + bearing + 'deg)';
+}
+
+// Start live DeviceOrientation compass
+function startLiveCompass() {
+  var btn        = document.getElementById('compass-enable-btn');
+  var statusDot  = document.getElementById('compass-status-dot');
+  var statusText = document.getElementById('compass-status-text');
+  var headingEl  = document.getElementById('qibla-device-heading');
+  var headingVal = document.getElementById('heading-val');
+  var note       = document.getElementById('qibla-note');
+
+  function onOrientation(e) {
+    // alpha = compass heading (0–360, 0 = North) on most devices
+    // webkitCompassHeading = iOS true heading (already corrected for magnetic declination)
+    var heading = null;
+
+    if (typeof e.webkitCompassHeading === 'number') {
+      // iOS — most accurate, already in true north degrees
+      heading = e.webkitCompassHeading;
+    } else if (typeof e.alpha === 'number') {
+      // Android — alpha is 0 when facing North, increases clockwise
+      heading = (360 - e.alpha) % 360;
+    }
+
+    if (heading === null || qiblaBearing === null) return;
+
+    // Rotate the entire compass ring so N always points up as device rotates
+    // Then the fixed needle pointing to qiblaBearing auto-aligns correctly
+    var compass = document.getElementById('qibla-compass');
+    var needle  = document.getElementById('compass-needle');
+    var kaaba   = document.getElementById('compass-kaaba');
+
+    // Ring rotates opposite to heading (counter-rotate) to stay stable
+    if (compass) {
+      compass.style.transform = 'rotate(' + (-heading) + 'deg)';
+      compass.style.transition = 'transform 0.3s ease-out';
+    }
+
+    // Needle always points to qibla bearing in world space
+    // Since compass ring is rotated -heading, needle must be at (qiblaBearing) total
+    // So needle transform = qiblaBearing (absolute world bearing is maintained)
+    var needleAngle = qiblaBearing;
+    if (needle) {
+      needle.style.transform = 'rotate(' + needleAngle + 'deg)';
+      needle.style.transition = 'transform 0.3s ease-out';
+    }
+    if (kaaba) {
+      kaaba.style.transform =
+        'rotate(' + needleAngle + 'deg) translateY(-76px) rotate(-' + needleAngle + 'deg)';
+      kaaba.style.transition = 'transform 0.3s ease-out';
+    }
+
+    // Update heading display
+    if (headingEl) headingEl.style.display = 'block';
+    if (headingVal) headingVal.textContent = Math.round(heading);
+
+    // Mark as active (first good reading)
+    if (!compassActive) {
+      compassActive = true;
+      if (statusDot)  statusDot.classList.add('active');
+      if (statusText) statusText.textContent = 'Live compass active';
+      if (btn)        btn.style.display = 'none';
+      if (note)       note.textContent  =
+        'The 🕋 points toward Mecca. Rotate your device — the Kaaba follows.';
+    }
+  }
+
+  compassHandler = onOrientation;
+
+  // iOS 13+ requires explicit permission request
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // Must be triggered by user gesture — wire to button
+    if (btn) {
+      btn.style.display = 'inline-flex';
+      btn.addEventListener('click', function() {
+        DeviceOrientationEvent.requestPermission()
+          .then(function(state) {
+            if (state === 'granted') {
+              window.addEventListener('deviceorientation', compassHandler, true);
+              if (statusText) statusText.textContent = 'Calibrating…';
+            } else {
+              if (statusText) statusText.textContent = 'Permission denied';
+            }
+          })
+          .catch(function() {
+            if (statusText) statusText.textContent = 'Sensor unavailable';
+          });
+      });
+    }
+  } else if (window.DeviceOrientationEvent) {
+    // Android / older iOS — no permission needed, start immediately
+    if (btn) btn.style.display = 'none';
+    if (statusText) statusText.textContent = 'Calibrating…';
+    window.addEventListener('deviceorientation', compassHandler, true);
+  } else {
+    // Device has no orientation sensor
+    if (statusText) statusText.textContent = 'No compass sensor detected';
+    if (btn) btn.style.display = 'none';
+  }
+}
+
+// Stop compass when city changes / page hidden
+function stopLiveCompass() {
+  if (compassHandler) {
+    window.removeEventListener('deviceorientation', compassHandler, true);
+    compassHandler = null;
+  }
+  compassActive = false;
+  var compass = document.getElementById('qibla-compass');
+  if (compass) compass.style.transform = '';
+}
+
+// Pause compass when app goes to background (saves battery)
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    stopLiveCompass();
+  } else if (qiblaBearing !== null && compassActive === false) {
+    // Resume on return — only if was previously active
+    startLiveCompass();
+  }
+});
+
 // Try to get Qibla coords from GPS on city load, fallback to geocoding city
 function tryFetchQibla() {
   if (!appData) return;
-  qiblaFetched = false;
+  qiblaFetched  = false;
+  qiblaBearing  = null;
+  stopLiveCompass();
   document.getElementById('qibla-section').style.display = 'none';
+
+  // Reset compass enable button
+  var btn = document.getElementById('compass-enable-btn');
+  var statusText = document.getElementById('compass-status-text');
+  if (btn) btn.style.display = 'inline-flex';
+  if (statusText) statusText.textContent = 'Tap to enable live compass';
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       function(pos) { fetchQibla(pos.coords.latitude, pos.coords.longitude); },
-      function()    {
-        // fallback: use Nominatim to get coords for currentCity
+      function() {
         fetch('https://nominatim.openstreetmap.org/search?city=' + encodeURIComponent(currentCity) +
               '&country=' + encodeURIComponent(currentCountry) + '&format=json&limit=1')
           .then(function(r) { return r.json(); })
-          .then(function(d) {
-            if (d && d[0]) fetchQibla(d[0].lat, d[0].lon);
-          }).catch(function() {});
+          .then(function(d) { if (d && d[0]) fetchQibla(d[0].lat, d[0].lon); })
+          .catch(function() {});
       },
       { timeout: 5000 }
     );
