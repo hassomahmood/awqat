@@ -1964,6 +1964,7 @@ body[data-theme="isha"]::after {
   border-bottom: 1px solid rgba(184,134,11,0.22);
   pointer-events: none;
   user-select: none;
+  display: none;
 }
 .bismillah-text {
   font-family: var(--ff-arabic);
